@@ -1,0 +1,15 @@
+# Ignore everything
+*
+
+# Allow gitignore itself
+!.gitignore
+
+# Allow only some files
+!pid_top.v
+
+# Allow the folder
+!pid/
+# Ignore everything inside again
+pid/*
+!pid/predictor.v
+
