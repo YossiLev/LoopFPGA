@@ -1104,17 +1104,19 @@ always@(posedge logic_clk or negedge rst)
             // resolving timeing issue with o_z_n:
             // do logic in a register and output the register
             //
-            if (manual_dac_output)
-            begin
-                reg_o_z_n <= manual_dac_output;
-            end
-            else if (!invert_output)
-            begin
-                reg_o_z_n <= dac_output;
-            end
-            else
-            begin
-                reg_o_z_n <= ~dac_output;
+            begin : reg_o_z_n_assign_1
+                reg [31:0] z_n_raw;
+                if (manual_dac_output)
+                    z_n_raw = manual_dac_output;
+                else if (!invert_output)
+                    z_n_raw = dac_output;
+                else
+                    z_n_raw = ~dac_output;
+
+                // Clamp output to [100 .. 8000]
+                if      (z_n_raw < 32'd50)   reg_o_z_n <= -32'd50;
+                else if (z_n_raw > 32'd8100) reg_o_z_n <= 32'd8100;
+                else                          reg_o_z_n <= z_n_raw;
             end
 
             //
@@ -1328,18 +1330,20 @@ always@(posedge logic_clk or negedge rst)
             // resolving timeing issue with o_z_n:
             // do logic in a register and output the register
             //
-            if (manual_dac_output)
-            begin
-                reg_o_z_n <= manual_dac_output;
-            end
-            else if (!invert_output)
-            begin
-                reg_o_z_n <= dac_output;
-            end
-            else
-            begin
-                reg_o_z_n <= ~dac_output;
-            end
+            begin : reg_o_z_n_assign_2
+                reg [31:0] z_n_raw;
+                if (manual_dac_output)
+                    z_n_raw = manual_dac_output;
+                else if (!invert_output)
+                    z_n_raw = dac_output;
+                else
+                    z_n_raw = ~dac_output;
+
+                // Clamp output to [100 .. 8000]
+                if      (z_n_raw < 32'd50)   reg_o_z_n <= -32'd50;
+                else if (z_n_raw > 32'd8100) reg_o_z_n <= 32'd8100;
+                else                          reg_o_z_n <= z_n_raw;
+             end
 
             //
             // If we get here then there's a non-zero delay count, which means
@@ -1497,17 +1501,19 @@ always@(posedge logic_clk or negedge rst)
             // resolving timeing issue with o_z_n:
             // do logic in a register and output the register
             //
-            if (manual_dac_output)
-            begin
-                reg_o_z_n <= manual_dac_output;
-            end
-            else if (!invert_output)
-            begin
-                reg_o_z_n <= dac_output;
-            end
-            else
-            begin
-                reg_o_z_n <= ~dac_output;
+            begin : reg_o_z_n_assign_3
+                reg [31:0] z_n_raw;
+                if (manual_dac_output)
+                    z_n_raw = manual_dac_output;
+                else if (!invert_output)
+                    z_n_raw = dac_output;
+                else
+                    z_n_raw = ~dac_output;
+
+                // Clamp output to [100 .. 8000]
+                if      (z_n_raw < 32'd50)   reg_o_z_n <= -32'd50;
+                else if (z_n_raw > 32'd8100) reg_o_z_n <= 32'd8100;
+                else                          reg_o_z_n <= z_n_raw;
             end
 
 
