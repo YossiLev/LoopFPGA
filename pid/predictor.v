@@ -1113,9 +1113,9 @@ always@(posedge logic_clk or negedge rst)
                 else
                     z_n_raw = ~dac_output;
 
-                // Clamp output to [100 .. 8000]
-                if      (z_n_raw < 32'd50)   reg_o_z_n <= -32'd50;
-                else if (z_n_raw > 32'd8100) reg_o_z_n <= 32'd8100;
+                // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
+                if      (z_n_raw < 32'd50)   reg_o_z_n <= 32'd50;
+                else if (z_n_raw > 32'd16350) reg_o_z_n <= 32'd16350;
                 else                          reg_o_z_n <= z_n_raw;
             end
 
@@ -1339,9 +1339,9 @@ always@(posedge logic_clk or negedge rst)
                 else
                     z_n_raw = ~dac_output;
 
-                // Clamp output to [100 .. 8000]
-                if      (z_n_raw < 32'd50)   reg_o_z_n <= -32'd50;
-                else if (z_n_raw > 32'd8100) reg_o_z_n <= 32'd8100;
+                // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
+                if      (z_n_raw < 32'd50)   reg_o_z_n <= 32'd50;
+                else if (z_n_raw > 32'd16350) reg_o_z_n <= 32'd16350;
                 else                          reg_o_z_n <= z_n_raw;
              end
 
@@ -1510,9 +1510,9 @@ always@(posedge logic_clk or negedge rst)
                 else
                     z_n_raw = ~dac_output;
 
-                // Clamp output to [100 .. 8000]
-                if      (z_n_raw < 32'd50)   reg_o_z_n <= -32'd50;
-                else if (z_n_raw > 32'd8100) reg_o_z_n <= 32'd8100;
+                // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
+                if      (z_n_raw < 32'd50)   reg_o_z_n <= 32'd50;
+                else if (z_n_raw > 32'd16350) reg_o_z_n <= 32'd16350;
                 else                          reg_o_z_n <= z_n_raw;
             end
 
