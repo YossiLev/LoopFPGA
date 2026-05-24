@@ -766,6 +766,10 @@ assign    kick_predictor    =    w_continuous; // Writing to PV kicks the pid
 reg       [31:0]   y_input_raw_1;
 reg       [31:0]   y_input_raw_2;
 
+        
+localparam signed [31:0] DAC_MIN = 32'sd50;
+localparam signed [31:0] DAC_MAX = 32'sd16350;
+
 
 //
 // A clear "name" for the high precision result of the predictor,
@@ -1105,8 +1109,8 @@ always@(posedge logic_clk or negedge rst)
             // do logic in a register and output the register
             //
             begin : reg_o_z_n_assign_1
-                reg [31:0] z_n_raw;
-                if (manual_dac_output)
+                reg signed [31:0] z_n_raw;
+                if (manual_dac_output_enable)
                     z_n_raw = manual_dac_output;
                 else if (!invert_output)
                     z_n_raw = dac_output;
@@ -1114,8 +1118,8 @@ always@(posedge logic_clk or negedge rst)
                     z_n_raw = ~dac_output;
 
                 // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
-                if      (z_n_raw < 32'd50)   reg_o_z_n <= 32'd50;
-                else if (z_n_raw > 32'd16350) reg_o_z_n <= 32'd16350;
+                if      (z_n_raw < DAC_MIN) reg_o_z_n <= DAC_MIN;
+                else if (z_n_raw > DAC_MAX) reg_o_z_n <= DAC_MAX;
                 else                          reg_o_z_n <= z_n_raw;
             end
 
@@ -1331,8 +1335,8 @@ always@(posedge logic_clk or negedge rst)
             // do logic in a register and output the register
             //
             begin : reg_o_z_n_assign_2
-                reg [31:0] z_n_raw;
-                if (manual_dac_output)
+                reg signed[31:0] z_n_raw;
+                if (manual_dac_output_enable)
                     z_n_raw = manual_dac_output;
                 else if (!invert_output)
                     z_n_raw = dac_output;
@@ -1340,8 +1344,8 @@ always@(posedge logic_clk or negedge rst)
                     z_n_raw = ~dac_output;
 
                 // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
-                if      (z_n_raw < 32'd50)   reg_o_z_n <= 32'd50;
-                else if (z_n_raw > 32'd16350) reg_o_z_n <= 32'd16350;
+                if      (z_n_raw < DAC_MIN) reg_o_z_n <= DAC_MIN;
+                else if (z_n_raw > DAC_MAX) reg_o_z_n <= DAC_MAX;
                 else                          reg_o_z_n <= z_n_raw;
              end
 
@@ -1502,18 +1506,21 @@ always@(posedge logic_clk or negedge rst)
             // do logic in a register and output the register
             //
             begin : reg_o_z_n_assign_3
-                reg [31:0] z_n_raw;
-                if (manual_dac_output)
+                reg signed [31:0] z_n_raw;
+                if (manual_dac_output_enable)
                     z_n_raw = manual_dac_output;
                 else if (!invert_output)
                     z_n_raw = dac_output;
                 else
                     z_n_raw = ~dac_output;
 
-                // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
-                if      (z_n_raw < 32'd50)   reg_o_z_n <= 32'd50;
-                else if (z_n_raw > 32'd16350) reg_o_z_n <= 32'd16350;
+                if      (z_n_raw < DAC_MIN) reg_o_z_n <= DAC_MIN;
+                else if (z_n_raw > DAC_MAX) reg_o_z_n <= DAC_MAX;
                 else                          reg_o_z_n <= z_n_raw;
+                // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
+                // if      (z_n_raw < 32'd50)   reg_o_z_n <= 32'd50;
+                // else if (z_n_raw > 32'd16350) reg_o_z_n <= 32'd16350;
+                // else                          reg_o_z_n <= z_n_raw;
             end
 
 
