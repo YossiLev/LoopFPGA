@@ -7,7 +7,7 @@
 # Allow only some files
 !pid_top.v
 !soc_system.qpf
-@soc_system.qsys
+!soc_system.qsys
 
 # Allow the folder
 !pid/
