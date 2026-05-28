@@ -656,6 +656,22 @@
          type = "String";
       }
    }
+   element pid_o_test_2
+   {
+      datum _sortIndex
+      {
+         value = "52";
+         type = "int";
+      }
+   }
+   element pid_o_test_2.s1
+   {
+      datum baseAddress
+      {
+         value = "704";
+         type = "String";
+      }
+   }
    element pid_o_y_input
    {
       datum _sortIndex
@@ -887,11 +903,6 @@
    internal="hps_0.f2h_warm_reset_req"
    type="reset"
    dir="end" />
- <interface
-   name="hps_0_h2f_reset"
-   internal="hps_0.h2f_reset"
-   type="reset"
-   dir="start" />
  <interface name="hps_0_h2f_user0_clock" internal="hps_0.h2f_user0_clock" />
  <interface name="hps_0_hps_io" internal="hps_0.hps_io" type="conduit" dir="end" />
  <interface name="memory" internal="hps_0.memory" type="conduit" dir="end" />
@@ -1063,6 +1074,11 @@
  <interface
    name="pid_o_test_1_external_connection"
    internal="pid_o_test_1.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="pid_o_test_2_external_connection"
+   internal="pid_o_test_2.external_connection"
    type="conduit"
    dir="end" />
  <interface
@@ -2345,6 +2361,24 @@
   <parameter name="width" value="32" />
  </module>
  <module
+   name="pid_o_test_2"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="InOut" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
    name="pid_o_y_input"
    kind="altera_avalon_pio"
    version="25.1"
@@ -2949,6 +2983,15 @@
  <connection
    kind="avalon"
    version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="pid_o_test_2.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x02c0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
    start="fpga_only_master.master"
    end="jtag_uart.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
@@ -3139,6 +3182,7 @@
    start="clk_0.clk"
    end="pid_o_dac_output.clk" />
  <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_1.clk" />
+ <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_2.clk" />
  <connection
    kind="clock"
    version="25.1"
@@ -3418,6 +3462,11 @@
    version="25.1"
    start="clk_0.clk_reset"
    end="pid_o_test_1.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="pid_o_test_2.reset" />
  <connection
    kind="reset"
    version="25.1"
