@@ -410,6 +410,8 @@ module pid_top(
 	wire   [31:0] pid_o_total_sum_high;
 	wire   [31:0] pid_o_total_sum_low;
 	wire   [31:0] pid_o_dac_output;
+  wire   [31:0] pid_o_test_1;
+  wire   [31:0] pid_o_test_2;
 	
   wire   [13:0] cpu_dac_a_output ;
   wire   [13:0] cpu_dac_b_output ; 
@@ -553,7 +555,7 @@ module pid_top(
 		.hps_0_f2h_stm_hw_events_stm_hwevents  (stm_hw_events),   //        hps_0_f2h_stm_hw_events.stm_hwevents
         .clk_clk                               (SYSTEM_CLOCK),                               //                            clk.clk
         .reset_reset_n                         (hps_fpga_reset_n),                         //                          reset.reset_n
-		.hps_0_h2f_reset_reset_n               (hps_fpga_reset_n),               //                hps_0_h2f_reset.reset_n
+		.hps_0_h2f_cold_reset_reset_n               (hps_fpga_reset_n),               //                hps_0_h2f_reset.reset_n
         .hps_0_f2h_warm_reset_req_reset_n      (~hps_warm_reset),      //       hps_0_f2h_warm_reset_req.reset_n
         .hps_0_f2h_debug_reset_req_reset_n     (~hps_debug_reset),     //      hps_0_f2h_debug_reset_req.reset_n
         .hps_0_f2h_cold_reset_req_reset_n      (~hps_cold_reset),       //       hps_0_f2h_cold_reset_req.reset_n
@@ -639,7 +641,11 @@ module pid_top(
         .pid_o_current_total_sum_high_external_connection_in_port     (pid_o_total_sum_high),     //    pid_o_current_total_sum_high_external_connection.in_port
         .pid_o_current_total_sum_low_external_connection_in_port      (pid_o_total_sum_low),      //     pid_o_current_total_sum_low_external_connection.in_port
 
-        .pid_o_dac_output_external_connection_in_port                 (pid_o_dac_output)
+        .pid_o_dac_output_external_connection_in_port                 (pid_o_dac_output),
+        .pid_o_test_1_external_connection_out_port                 (pid_i_test_1),
+        .pid_o_test_2_external_connection_out_port                 (pid_i_test_2),
+        .pid_o_test_1_external_connection_in_port                 (pid_o_test_1),
+        .pid_o_test_2_external_connection_in_port                 (pid_o_test_2)
 		  
 		
     );
@@ -845,7 +851,11 @@ predictor  pid_6_predictor (
 			.o_current_sum_before_rebase(pid_o_current_sum_before_rebase),
 			.o_current_total_sum_high(pid_o_total_sum_high),
 		   .o_current_total_sum_low(pid_o_total_sum_low),
-			.o_dac_output(pid_o_dac_output)
+			.o_dac_output(pid_o_dac_output),
+      .i_test_1(pid_i_test_1),
+      .i_test_2(pid_i_test_2),
+      .o_test_1(pid_o_test_1),
+      .o_test_2(pid_o_test_2)
 );    
 
 

@@ -214,7 +214,11 @@ module predictor
 	 output   wire [31:0] o_current_total_sum_low,
 
     output   wire [31:0] o_debug_reg1,
-    output   wire [31:0] o_dac_output
+    output   wire [31:0] o_dac_output,
+    input    wire [31:0] i_test_1,
+    input    wire [31:0] i_test_2,
+    output   wire [31:0] o_test_1,
+    output   wire [31:0] o_test_2
 );
 
 
@@ -1664,6 +1668,7 @@ assign o_current_sum_before_rebase = current_sum_shifted_before_rebase ;
 assign o_current_total_sum_high = {current_sum_total[`INTERNAL_HIGH_ORDER_BIT:32]};
 assign o_current_total_sum_low = current_sum_total[31:0];
 assign o_dac_output = dac_output;
-
+assign o_test_1 = current_sum_shifted_before_rebase;
+assign o_test_2 = current_sum_shifted_rebased;
 
 endmodule
