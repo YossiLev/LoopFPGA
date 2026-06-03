@@ -412,6 +412,10 @@ module pid_top(
 	wire   [31:0] pid_o_dac_output;
   wire   [31:0] pid_o_test_1;
   wire   [31:0] pid_o_test_2;
+  wire   [31:0] pid_o_test_3;
+  wire   [31:0] pid_o_test_4;
+  wire   [31:0] pid_o_test_5;
+  wire   [31:0] pid_o_test_6;
 	
   wire   [13:0] cpu_dac_a_output ;
   wire   [13:0] cpu_dac_b_output ; 
@@ -644,8 +648,16 @@ module pid_top(
         .pid_o_dac_output_external_connection_in_port                 (pid_o_dac_output),
         .pid_o_test_1_external_connection_out_port                 (pid_i_test_1),
         .pid_o_test_2_external_connection_out_port                 (pid_i_test_2),
+        .pid_o_test_3_external_connection_out_port                 (pid_i_test_3),
+        .pid_o_test_4_external_connection_out_port                 (pid_i_test_4),
+        .pid_o_test_5_external_connection_out_port                 (pid_i_test_5),
+        .pid_o_test_6_external_connection_out_port                 (pid_i_test_6),
         .pid_o_test_1_external_connection_in_port                 (pid_o_test_1),
-        .pid_o_test_2_external_connection_in_port                 (pid_o_test_2)
+        .pid_o_test_2_external_connection_in_port                 (pid_o_test_2),
+        .pid_o_test_3_external_connection_in_port                 (pid_o_test_3),
+        .pid_o_test_4_external_connection_in_port                 (pid_o_test_4),
+        .pid_o_test_5_external_connection_in_port                 (pid_o_test_5),
+        .pid_o_test_6_external_connection_in_port                 (pid_o_test_6)
 		  
 		
     );
@@ -854,8 +866,16 @@ predictor  pid_6_predictor (
 			.o_dac_output(pid_o_dac_output),
       .i_test_1(pid_i_test_1),
       .i_test_2(pid_i_test_2),
+      .i_test_3(pid_i_test_3),
+      .i_test_4(pid_i_test_4),
+      .i_test_5(pid_i_test_5),
+      .i_test_6(pid_i_test_6),
       .o_test_1(pid_o_test_1),
-      .o_test_2(pid_o_test_2)
+      .o_test_2(pid_o_test_2),
+      .o_test_3(pid_o_test_3),
+      .o_test_4(pid_o_test_4),
+      .o_test_5(pid_o_test_5),
+      .o_test_6(pid_o_test_6)
 );    
 
 

@@ -217,8 +217,16 @@ module predictor
     output   wire [31:0] o_dac_output,
     input    wire [31:0] i_test_1,
     input    wire [31:0] i_test_2,
+    input    wire [31:0] i_test_3,
+    input    wire [31:0] i_test_4,
+    input    wire [31:0] i_test_5,
+    input    wire [31:0] i_test_6,
     output   wire [31:0] o_test_1,
-    output   wire [31:0] o_test_2
+    output   wire [31:0] o_test_2,
+    output   wire [31:0] o_test_3,
+    output   wire [31:0] o_test_4,
+    output   wire [31:0] o_test_5,
+    output   wire [31:0] o_test_6
 );
 
 
@@ -553,26 +561,29 @@ always@(posedge reg_clk or negedge rst)
         begin
             if (i_cs[1])
             begin
-                r0   <= {16*i_q0_q4[15], i_q0_q4[15:0]};
-                r4   <= {16*i_q0_q4[31], i_q0_q4[31:16]};
+                r0   <= {{16{i_q0_q4[15]}}, i_q0_q4[15:0]};
+                r4   <= {{16{i_q0_q4[31]}}, i_q0_q4[31:16]};
             end
 
             if (i_cs[2])
             begin
-                r1 <= {16*i_q1_q5[15], i_q1_q5[15:0]};
-                r5 <= {16*i_q1_q5[31], i_q1_q5[31:16]};
+                // r0 <= { {16{i_q0_q4[15]}}, i_q0_q4[15:0] };
+                r1 <= {{16{i_q1_q5[15]}}, i_q1_q5[15:0]};
+                r5 <= {{16{i_q1_q5[31]}}, i_q1_q5[31:16]};
+                // r1 <= {16*i_q1_q5[15], i_q1_q5[15:0]};
+                // r5 <= {16*i_q1_q5[31], i_q1_q5[31:16]};
             end
 
             if (i_cs[3])
             begin
-                r2 <= {16*i_q2_q6[15], i_q2_q6[15:0]};
-                r6 <= {16*i_q2_q6[31], i_q2_q6[31:16]};
+                r2 <= {{16{i_q2_q6[15]}}, i_q2_q6[15:0]};
+                r6 <= {{16{i_q2_q6[31]}}, i_q2_q6[31:16]};
             end
 
             if (i_cs[4])
             begin
-                r3 <= {16*i_q3_q7[15], i_q3_q7[15:0]};
-                r7 <= {16*i_q3_q7[31], i_q3_q7[31:16]};
+                r3 <= {{16{i_q3_q7[15]}}, i_q3_q7[15:0]};
+                r7 <= {{16{i_q3_q7[31]}}, i_q3_q7[31:16]};
             end
 
             if    (i_cs[5])
@@ -606,7 +617,7 @@ always@(posedge reg_clk or negedge rst)
 
             if    (i_cs[7])
             begin
-                i0                       <= {16*i_i0[15], i_i0[15:0]};
+                i0                       <= {{16{i_i0[15]}}, i_i0[15:0]};
             end
 
             if    (i_cs[11])
@@ -719,7 +730,7 @@ always@(posedge reg_clk or negedge rst)
                 //
                 // 3rd config
                 //
-                i0_2nd <= {16*i2_3rd_config[15], i2_3rd_config[15: 0]};
+                i0_2nd <= {{16{i2_3rd_config[15]}}, i2_3rd_config[15: 0]};
             end
 
             if (i2_cs[13])
@@ -1668,7 +1679,11 @@ assign o_current_sum_before_rebase = current_sum_shifted_before_rebase ;
 assign o_current_total_sum_high = {current_sum_total[`INTERNAL_HIGH_ORDER_BIT:32]};
 assign o_current_total_sum_low = current_sum_total[31:0];
 assign o_dac_output = dac_output;
-assign o_test_1 = current_sum_shifted_before_rebase;
-assign o_test_2 = current_sum_shifted_rebased;
+assign o_test_1 = r0_y_n[31:0];
+assign o_test_2 = r1_y_n_1[31:0];
+assign o_test_3 = r2_y_n_2[31:0];
+assign o_test_4 = r1;
+assign o_test_5 = y_n_1;
+assign o_test_6 = w_r1_y_n_1[31:0];
 
 endmodule

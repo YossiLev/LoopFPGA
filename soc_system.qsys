@@ -672,6 +672,70 @@
          type = "String";
       }
    }
+   element pid_o_test_3
+   {
+      datum _sortIndex
+      {
+         value = "53";
+         type = "int";
+      }
+   }
+   element pid_o_test_3.s1
+   {
+      datum baseAddress
+      {
+         value = "720";
+         type = "String";
+      }
+   }
+   element pid_o_test_4
+   {
+      datum _sortIndex
+      {
+         value = "54";
+         type = "int";
+      }
+   }
+   element pid_o_test_4.s1
+   {
+      datum baseAddress
+      {
+         value = "736";
+         type = "String";
+      }
+   }
+   element pid_o_test_5
+   {
+      datum _sortIndex
+      {
+         value = "55";
+         type = "int";
+      }
+   }
+   element pid_o_test_5.s1
+   {
+      datum baseAddress
+      {
+         value = "752";
+         type = "String";
+      }
+   }
+   element pid_o_test_6
+   {
+      datum _sortIndex
+      {
+         value = "56";
+         type = "int";
+      }
+   }
+   element pid_o_test_6.s1
+   {
+      datum baseAddress
+      {
+         value = "768";
+         type = "String";
+      }
+   }
    element pid_o_y_input
    {
       datum _sortIndex
@@ -1084,6 +1148,26 @@
  <interface
    name="pid_o_test_2_external_connection"
    internal="pid_o_test_2.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="pid_o_test_3_external_connection"
+   internal="pid_o_test_3.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="pid_o_test_4_external_connection"
+   internal="pid_o_test_4.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="pid_o_test_5_external_connection"
+   internal="pid_o_test_5.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="pid_o_test_6_external_connection"
+   internal="pid_o_test_6.external_connection"
    type="conduit"
    dir="end" />
  <interface
@@ -2384,6 +2468,78 @@
   <parameter name="width" value="32" />
  </module>
  <module
+   name="pid_o_test_3"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="InOut" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="pid_o_test_4"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="InOut" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="pid_o_test_5"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="InOut" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="pid_o_test_6"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="InOut" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
    name="pid_o_y_input"
    kind="altera_avalon_pio"
    version="25.1"
@@ -2997,6 +3153,42 @@
  <connection
    kind="avalon"
    version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="pid_o_test_3.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x02d0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="pid_o_test_4.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x02e0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="pid_o_test_5.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x02f0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="pid_o_test_6.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0300" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
    start="fpga_only_master.master"
    end="jtag_uart.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
@@ -3188,6 +3380,10 @@
    end="pid_o_dac_output.clk" />
  <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_1.clk" />
  <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_2.clk" />
+ <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_3.clk" />
+ <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_4.clk" />
+ <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_5.clk" />
+ <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_6.clk" />
  <connection
    kind="clock"
    version="25.1"
@@ -3472,6 +3668,26 @@
    version="25.1"
    start="clk_0.clk_reset"
    end="pid_o_test_2.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="pid_o_test_3.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="pid_o_test_4.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="pid_o_test_5.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="pid_o_test_6.reset" />
  <connection
    kind="reset"
    version="25.1"
