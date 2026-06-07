@@ -381,7 +381,7 @@ reg     [31:0]    pre_dither_manual_value
 
 reg               sw_reset_request
                                 ;    // S/W reset signal                                
-reg     [31:0]    y_reference   ;    // The reference point from which y_input is subtracted.
+reg     signed [31:0]    y_reference   ;    // The reference point from which y_input is subtracted.
                                      // (i.e., the aim of the system is to
                                      // reduce this difference y_n = y_input - y_reference
                                      // to 0)
@@ -392,7 +392,8 @@ reg     [31:0]    y_reference   ;    // The reference point from which y_input i
 
 reg     [31:0]    y_average_sum ;                                     
 
-reg     [31:0]    y_input       ;
+reg     signed [31:0]    y_input       ;
+reg     signed [31:0]    y_input_for_yn   ;    // y_input_for_yn = y_input as fed to the y_n calculation, which may be different from y_input if some of the input modifications are enabled (like input averaging or taking the difference between two inputs instead of one of them).;
 
 reg               manual_dac_output_enable     
                                 ;
@@ -778,8 +779,8 @@ wire      kick_predictor    ;    // Once kick is detected, the predictor begins 
 //
 assign    kick_predictor    =    w_continuous; // Writing to PV kicks the pid                                                                            
 
-reg       [31:0]   y_input_raw_1;
-reg       [31:0]   y_input_raw_2;
+reg       signed [31:0]   y_input_raw_1;
+reg       signed [31:0]   y_input_raw_2;
 
         
 localparam signed [31:0] DAC_MIN = 32'sd50;
@@ -800,6 +801,7 @@ always@(posedge logic_clk or negedge rst)
     if (!rst) begin
         state_1      <= `STATE_0A        ;
         y_input      <= 0                ;
+        y_input_for_yn <= 0                ;
         y_input_raw_1<= 0                ;
         y_input_raw_2<= 0                ;
         save_y_n     <= 0                ;
@@ -879,6 +881,7 @@ always@(posedge logic_clk or negedge rst)
         `STATE_0A:   begin
             if(reset_pending)begin   
                 y_input      <= 0                ;
+                y_input_for_yn <= 0                ;
                 y_n          <= 0                ;
                 y_n_1        <= 0                ;
                 y_n_2        <= 0                ;
@@ -936,10 +939,12 @@ always@(posedge logic_clk or negedge rst)
             // When just beginning contintuous operation, we assuume
             // difference input
             //
-            y_input       <= i_yn1 - i_yn2 - y_reference ;
+            // y_input       <= i_yn1 - i_yn2 - y_reference ;
+
         end
 
         `STATE_0B:   begin
+            y_input <= y_input_raw_1 - y_input_raw_2 - y_reference;  // now uses registered values
             //
             // Force additional cycle to ensure we always start working 
             // on an even clock cycle
@@ -965,8 +970,7 @@ always@(posedge logic_clk or negedge rst)
             //
             // Keep a copy of the current sum for the 2nd integration
             //
-            current_sum_shifted_before_rebase_2nd 
-                                        <= current_sum_shifted_before_rebase;
+            current_sum_shifted_before_rebase_2nd  <= current_sum_shifted_before_rebase;
             //
             // 'dac_output' is the real output - we evaluate it in the same
             // way as the 'current_sum_shifted_rebased'.
@@ -1059,10 +1063,9 @@ always@(posedge logic_clk or negedge rst)
                     dither_input_state <= 5'b00001;
                 end
 
-                dither_input_polarity
-                                    <= dither_input_init_polarity;
+                dither_input_polarity <= dither_input_init_polarity;
 
-                dither_input_count  <= 1'b1;
+                dither_input_count <= 1'b1;
 
                 y_average_sum <= (dither_input_init_polarity ? y_input : -y_input);
             end
@@ -1071,16 +1074,15 @@ always@(posedge logic_clk or negedge rst)
                 //
                 // No input dithering, just pick up the input
                 //
-                y_average_sum 
-                          <= y_input;
+                y_average_sum <= y_input;
             end
+            y_input_for_yn <= y_input;   // y_input_for_yn is the value of the input as fed to the y_n calculation, which may be different from y_input if some of the input modifications are enabled (like input averaging or taking the difference between two inputs instead of one of them).;
 
             if (dither_output_enable)
             begin
                 dither_output_polarity <= 0;
 
                 dither_output_count <= 1'b1;
-
             end
 
             state_1   <= `STATE_2;
@@ -1248,7 +1250,7 @@ always@(posedge logic_clk or negedge rst)
             begin
                 dac_2nd_output <= integral_2nd_sum[output_shift_2nd +: 32] - out_offset_2nd;
             end
-            
+            y_input_for_yn <= y_input;  // y_input_for_yn is the value of the input as fed to the y_n calculation, which may be different from y_input if some of the input modifications are enabled (like input averaging or taking the difference between two inputs instead of one of them).;
 
         end
 
@@ -1280,7 +1282,7 @@ always@(posedge logic_clk or negedge rst)
             end
             else
             begin
-                y_n <= (invert_y_n ? ~y_input       : y_input      );
+                y_n <= (invert_y_n ? ~y_input_for_yn       : y_input_for_yn      );
             end
 
             if (!pre_dither_manual_value)
@@ -1545,7 +1547,7 @@ always@(posedge logic_clk or negedge rst)
             end
             else
             begin
-                y_n <= (invert_y_n ? ~y_input       : y_input      );
+                y_n <= (invert_y_n ? ~y_input_for_yn       : y_input_for_yn      );
             end
 
             //
@@ -1553,6 +1555,7 @@ always@(posedge logic_clk or negedge rst)
             // (if more than 4 cycles, this is taken again in state 6).
             // 
             y_input <= y_input_raw_1 - y_input_raw_2 - y_reference ;
+            y_input_for_yn <= y_input_raw_1 - y_input_raw_2 - y_reference ;
 
             delay_counter <= delay_counter_intermediate;
 
@@ -1679,11 +1682,11 @@ assign o_current_sum_before_rebase = current_sum_shifted_before_rebase ;
 assign o_current_total_sum_high = {current_sum_total[`INTERNAL_HIGH_ORDER_BIT:32]};
 assign o_current_total_sum_low = current_sum_total[31:0];
 assign o_dac_output = dac_output;
-assign o_test_1 = r0_y_n[31:0];
-assign o_test_2 = r1_y_n_1[31:0];
-assign o_test_3 = r2_y_n_2[31:0];
-assign o_test_4 = r1;
-assign o_test_5 = y_n_1;
-assign o_test_6 = w_r1_y_n_1[31:0];
+assign o_test_1 = i_yn1;
+assign o_test_2 = i_yn2;
+assign o_test_3 = y_input_raw_1;
+assign o_test_4 = y_input_raw_2;
+assign o_test_5 = y_input;
+assign o_test_6 = y_reference;
 
 endmodule
