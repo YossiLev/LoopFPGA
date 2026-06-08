@@ -494,8 +494,6 @@ reg  [31:0]  reg_o_z_n                  ;
 
 reg  [31:0]  dac_2nd_output             ;
 
-
-
 mult_32_32  mult_r0_y_n   (  .clock(logic_clk), .dataa(r0), .datab(y_n  ), .result(w_r0_y_n   )   ) ;     
 mult_32_32  mult_r1_y_n_1 (  .clock(logic_clk), .dataa(r1), .datab(y_n_1), .result(w_r1_y_n_1 )   ) ;
 mult_32_32  mult_r2_y_n_2 (  .clock(logic_clk), .dataa(r2), .datab(y_n_2), .result(w_r2_y_n_2 )   ) ;
@@ -506,6 +504,7 @@ mult_32_32  mult_r6_y_n_6 (  .clock(logic_clk), .dataa(r6), .datab(y_n_6), .resu
 mult_32_32  mult_r7_y_n_7 (  .clock(logic_clk), .dataa(r7), .datab(y_n_7), .result(w_r7_y_n_7 )   ) ;
 mult_32_32  mult_i0_y_n   (  .clock(logic_clk), .dataa(i0    ), .datab(y_n  ), .result(w_i0_y_n   )   ) ;
 mult_32_32  mult_i0_2nd   (  .clock(logic_clk), .dataa(i0_2nd), .datab(current_sum_shifted_before_rebase_2nd), .result(w_i0_2nd_sum)   ) ;
+
 // Two-flop synchronizer for y_reference (reg_clk -> logic_clk domain crossing)
 reg signed [31:0] y_reference_sync1;
 reg signed [31:0] y_reference_sync2;
@@ -805,8 +804,7 @@ localparam signed [31:0] DAC_MAX = 32'sd16350;
 // A clear "name" for the high precision result of the predictor,
 // before any shifts and PWM shaping of the output signal.
 //
-assign    w_predictor_high_precision_output
-                          = current_sum_total;
+assign    w_predictor_high_precision_output = current_sum_total;
 
 //
 // The actual predictor FSM
@@ -1265,7 +1263,7 @@ always@(posedge logic_clk or negedge rst)
             begin
                 dac_2nd_output <= integral_2nd_sum[output_shift_2nd +: 32] - out_offset_2nd;
             end
-            y_input_for_yn <= y_input;  // y_input_for_yn is the value of the input as fed to the y_n calculation, which may be different from y_input if some of the input modifications are enabled (like input averaging or taking the difference between two inputs instead of one of them).;
+            y_input_for_yn <= y_input;
 
         end
 
