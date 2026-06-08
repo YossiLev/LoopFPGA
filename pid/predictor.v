@@ -392,8 +392,9 @@ reg     signed [31:0]    y_reference   ;    // The reference point from which y_
 
 reg     [31:0]    y_average_sum ;                                     
 
-reg     signed [31:0]    y_input       ;
-reg     signed [31:0]    y_input_for_yn   ;    // y_input_for_yn = y_input as fed to the y_n calculation, which may be different from y_input if some of the input modifications are enabled (like input averaging or taking the difference between two inputs instead of one of them).;
+reg     signed [31:0]    y_input;
+reg     signed [31:0]    y_input_for_yn;
+reg     signed [31:0]    y_input_for_out;
 
 reg               manual_dac_output_enable     
                                 ;
@@ -505,6 +506,19 @@ mult_32_32  mult_r6_y_n_6 (  .clock(logic_clk), .dataa(r6), .datab(y_n_6), .resu
 mult_32_32  mult_r7_y_n_7 (  .clock(logic_clk), .dataa(r7), .datab(y_n_7), .result(w_r7_y_n_7 )   ) ;
 mult_32_32  mult_i0_y_n   (  .clock(logic_clk), .dataa(i0    ), .datab(y_n  ), .result(w_i0_y_n   )   ) ;
 mult_32_32  mult_i0_2nd   (  .clock(logic_clk), .dataa(i0_2nd), .datab(current_sum_shifted_before_rebase_2nd), .result(w_i0_2nd_sum)   ) ;
+// Two-flop synchronizer for y_reference (reg_clk -> logic_clk domain crossing)
+reg signed [31:0] y_reference_sync1;
+reg signed [31:0] y_reference_sync2;
+
+always @(posedge logic_clk or negedge rst) begin
+    if (!rst) begin
+        y_reference_sync1 <= 0;
+        y_reference_sync2 <= 0;
+    end else begin
+        y_reference_sync1 <= y_reference;
+        y_reference_sync2 <= y_reference_sync1;
+    end
+end
 //
 // state machine No.1
 // Handles host writes to regs
@@ -944,7 +958,7 @@ always@(posedge logic_clk or negedge rst)
         end
 
         `STATE_0B:   begin
-            y_input <= y_input_raw_1 - y_input_raw_2 - y_reference;  // now uses registered values
+            y_input <= y_input_raw_1 - y_input_raw_2 - y_reference_sync2;  // now uses registered values
             //
             // Force additional cycle to ensure we always start working 
             // on an even clock cycle
@@ -1076,7 +1090,8 @@ always@(posedge logic_clk or negedge rst)
                 //
                 y_average_sum <= y_input;
             end
-            y_input_for_yn <= y_input;   // y_input_for_yn is the value of the input as fed to the y_n calculation, which may be different from y_input if some of the input modifications are enabled (like input averaging or taking the difference between two inputs instead of one of them).;
+            y_input_for_yn <= y_input;
+            y_input_for_out <= y_input;
 
             if (dither_output_enable)
             begin
@@ -1145,7 +1160,7 @@ always@(posedge logic_clk or negedge rst)
             // y_reference input. Note that if input difference is disabled, 
             // y_input_raw_2 is essentially 0.
             //
-            y_input         <= y_input_raw_1 - y_input_raw_2 - y_reference ;
+            y_input         <= y_input_raw_1 - y_input_raw_2 - y_reference_sync2 ;
             i0_y_n_shifted  <= i0_y_n[i0_shift +:48];
 
             //
@@ -1262,7 +1277,7 @@ always@(posedge logic_clk or negedge rst)
             // 2nd take of y_input in a single predictor 4 cycle operation
             // (if more than 4 cycles, this is taken again in state 6).
             // 
-            y_input <= y_input_raw_1 - y_input_raw_2 - y_reference ;
+            y_input <= y_input_raw_1 - y_input_raw_2 - y_reference_sync2 ;
 
             counter <= count_output;// count++
 
@@ -1554,9 +1569,8 @@ always@(posedge logic_clk or negedge rst)
             // 2nd take of y_input in a single predictor 4 cycle operation
             // (if more than 4 cycles, this is taken again in state 6).
             // 
-            y_input <= y_input_raw_1 - y_input_raw_2 - y_reference ;
-            y_input_for_yn <= y_input_raw_1 - y_input_raw_2 - y_reference ;
-
+            y_input <= y_input_raw_1 - y_input_raw_2 - y_reference_sync2 ;
+            y_input_for_yn <= y_input_raw_1 - y_input_raw_2 - y_reference_sync2 ; 
             delay_counter <= delay_counter_intermediate;
 
             if (delay_counter_intermediate < delay_count)
@@ -1585,7 +1599,7 @@ always@(posedge logic_clk or negedge rst)
     end
 
 
-wire    ready;
+wire    ready;  //???
 
 
                                        
@@ -1633,7 +1647,7 @@ assign    o_out_offset = out_offset;
 assign    o_i0         = i0;
 assign    o_integral_sum
                        = integral_sum[31:0];
-assign    o_y_reference= y_reference;                       
+assign    o_y_reference= y_reference_sync2   ;                       
 assign    o_z_n_no_integral
                        = current_sum_total[31:0];
 assign    o_y_input    = {y_input};
@@ -1687,6 +1701,6 @@ assign o_test_2 = i_yn2;
 assign o_test_3 = y_input_raw_1;
 assign o_test_4 = y_input_raw_2;
 assign o_test_5 = y_input;
-assign o_test_6 = y_reference;
+assign o_test_6 = y_input_for_out;
 
 endmodule
