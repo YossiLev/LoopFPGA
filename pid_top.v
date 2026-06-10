@@ -32,7 +32,7 @@
 // ============================================================================
 
 `define ENABLE_HPS
-`define VERSION   32'h00001170
+`define VERSION   32'h00001171
 `define MAGIC     32'h11347698
 
 //
@@ -416,6 +416,16 @@ module pid_top(
   wire   [31:0] pid_o_test_4;
   wire   [31:0] pid_o_test_5;
   wire   [31:0] pid_o_test_6;
+  wire   [31:0] pid_o_test_7;
+  wire   [31:0] pid_o_test_8;
+  wire   [31:0] pid_o_test_9;
+  wire   [31:0] pid_o_test_10;
+  wire   [31:0] pid_o_test_11;
+  wire   [31:0] pid_o_test_12;
+  wire   [31:0] pid_o_test_13;
+  wire   [31:0] pid_o_test_14;
+  wire   [31:0] pid_o_test_15;
+  wire   [31:0] pid_o_test_16;
 	
   wire   [13:0] cpu_dac_a_output ;
   wire   [13:0] cpu_dac_b_output ; 
@@ -652,12 +662,31 @@ module pid_top(
         .pid_o_test_4_external_connection_out_port                 (pid_i_test_4),
         .pid_o_test_5_external_connection_out_port                 (pid_i_test_5),
         .pid_o_test_6_external_connection_out_port                 (pid_i_test_6),
+        .pid_o_test_7_external_connection_out_port                 (pid_i_test_7),
+        .pid_o_test_8_external_connection_out_port                 (pid_i_test_8),
+        .pid_o_test_9_external_connection_out_port                 (pid_i_test_9),
+        .pid_o_test_10_external_connection_out_port                 (pid_i_test_10),
+        .pid_o_test_11_external_connection_out_port                 (pid_i_test_11),
+        .pid_o_test_12_external_connection_out_port                 (pid_i_test_12),
+        .pid_o_test_13_external_connection_out_port                 (pid_i_test_13),
+        .pid_o_test_14_external_connection_out_port                 (pid_i_test_14),
+        .pid_o_test_15_external_connection_out_port                 (pid_i_test_15),
+        .pid_o_test_16_external_connection_out_port                 (pid_i_test_16),
         .pid_o_test_1_external_connection_in_port                 (pid_o_test_1),
         .pid_o_test_2_external_connection_in_port                 (pid_o_test_2),
         .pid_o_test_3_external_connection_in_port                 (pid_o_test_3),
         .pid_o_test_4_external_connection_in_port                 (pid_o_test_4),
         .pid_o_test_5_external_connection_in_port                 (pid_o_test_5),
-        .pid_o_test_6_external_connection_in_port                 (pid_o_test_6)
+        .pid_o_test_6_external_connection_in_port                 (pid_o_test_6),
+        .pid_o_test_7_external_connection_in_port                 (pid_o_test_7),
+        .pid_o_test_8_external_connection_in_port                 (pid_o_test_8),
+        .pid_o_test_9_external_connection_in_port                 (pid_o_test_9),
+        .pid_o_test_10_external_connection_in_port                 (pid_o_test_10),
+        .pid_o_test_11_external_connection_in_port                 (pid_o_test_11),
+        .pid_o_test_12_external_connection_in_port                 (pid_o_test_12),
+        .pid_o_test_13_external_connection_in_port                 (pid_o_test_13),
+        .pid_o_test_14_external_connection_in_port                 (pid_o_test_14),
+        .pid_o_test_15_external_connection_in_port                 (pid_o_test_15),
 		  
 		
     );
@@ -870,12 +899,32 @@ predictor  pid_6_predictor (
       .i_test_4(pid_i_test_4),
       .i_test_5(pid_i_test_5),
       .i_test_6(pid_i_test_6),
+      .i_test_7(pid_i_test_7),
+      .i_test_8(pid_i_test_8),
+      .i_test_9(pid_i_test_9),
+      .i_test_10(pid_i_test_10),
+      .i_test_11(pid_i_test_11),
+      .i_test_12(pid_i_test_12),
+      .i_test_13(pid_i_test_13),
+      .i_test_14(pid_i_test_14),
+      .i_test_15(pid_i_test_15),
+      .i_test_16(pid_i_test_16),
       .o_test_1(pid_o_test_1),
       .o_test_2(pid_o_test_2),
       .o_test_3(pid_o_test_3),
       .o_test_4(pid_o_test_4),
       .o_test_5(pid_o_test_5),
-      .o_test_6(pid_o_test_6)
+      .o_test_6(pid_o_test_6),
+      .o_test_7(pid_o_test_7),
+      .o_test_8(pid_o_test_8),
+      .o_test_9(pid_o_test_9),
+      .o_test_10(pid_o_test_10),
+      .o_test_11(pid_o_test_11),
+      .o_test_12(pid_o_test_12),
+      .o_test_13(pid_o_test_13),
+      .o_test_14(pid_o_test_14),
+      .o_test_15(pid_o_test_15),
+      .o_test_16(pid_o_test_16)
 );    
 
 

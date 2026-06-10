@@ -221,12 +221,32 @@ module predictor
     input    wire [31:0] i_test_4,
     input    wire [31:0] i_test_5,
     input    wire [31:0] i_test_6,
+    input    wire [31:0] i_test_7,
+    input    wire [31:0] i_test_8,
+    input    wire [31:0] i_test_9,
+    input    wire [31:0] i_test_10,
+    input    wire [31:0] i_test_11,
+    input    wire [31:0] i_test_12,
+    input    wire [31:0] i_test_13,
+    input    wire [31:0] i_test_14,
+    input    wire [31:0] i_test_15,
+    input    wire [31:0] i_test_16,   
     output   wire [31:0] o_test_1,
     output   wire [31:0] o_test_2,
     output   wire [31:0] o_test_3,
     output   wire [31:0] o_test_4,
     output   wire [31:0] o_test_5,
-    output   wire [31:0] o_test_6
+    output   wire [31:0] o_test_6,
+    output   wire [31:0] o_test_7,
+    output   wire [31:0] o_test_8,
+    output   wire [31:0] o_test_9,
+    output   wire [31:0] o_test_10,
+    output   wire [31:0] o_test_11,
+    output   wire [31:0] o_test_12,
+    output   wire [31:0] o_test_13,
+    output   wire [31:0] o_test_14,
+    output   wire [31:0] o_test_15,
+    output   wire [31:0] o_test_16
 );
 
 
@@ -490,6 +510,7 @@ reg  [15:0]  dither_input_init_count    ;
 reg  [15:0]  dither_input_next_count    ;   
 reg  [15:0]  dither_input_count         ;
 reg  [31:0]  dac_output                 ;
+reg  [31:0]  dac_output_out             ;
 reg  [31:0]  reg_o_z_n                  ;
 
 reg  [31:0]  dac_2nd_output             ;
@@ -840,49 +861,31 @@ always@(posedge logic_clk or negedge rst)
         r6_y_n_6     <= 0                ;
         r7_y_n_7     <= 0                ;
         i0_y_n       <= 0                ;
-        i0_y_n_shifted
-                     <= 0                ;
-        sum_r0_yn_r2_yn2         
-                     <= 0                ;
-        sum_r3_yn3_r5_yn5         
-                     <= 0                ;
-        current_sum_total         
-                     <= 0                ;
-        current_sum_shifted_before_rebase
-                     <= 0                ;
-        current_sum_shifted_rebased 
-                     <= 0                ;
+        i0_y_n_shifted <= 0                ;
+        sum_r0_yn_r2_yn2 <= 0                ;
+        sum_r3_yn3_r5_yn5 <= 0                ;
+        current_sum_total <= 0                ;
+        current_sum_shifted_before_rebase <= 0                ;
+        current_sum_shifted_rebased <= 0                ;
         count_input  <= 32'b0            ;
         counter      <= 32'b0            ;
         reset_pending<= 0                ;
         integral_sum <= 0                ;
-        integral_2nd_sum  
-                     <= 0                ;
+        integral_2nd_sum <= 0                ;
         delay_counter<= 0                ;
-        delay_counter_intermediate
-                     <= 0                ;
+        delay_counter_intermediate <= 0                ;
         y_average_sum<= 0                ;
-        output_precision_counter 
-                     <= 0                ;
-        output_precision_high_value 
-                     <= 0                ;
-        output_precision_low_value       
-                     <= 0                ;
-        output_precision_current_value          
-                     <= 0                ;
-        dither_input_state
-                     <= 0                ;
-        dither_input_count
-                     <= 0                ;
-        dither_output_polarity
-                     <= 0                ;
-        dither_input_polarity
-                     <= 0                ;
-        dither_output_count
-                     <= 0                ;
+        output_precision_counter <= 0                ;
+        output_precision_high_value <= 0                ;
+        output_precision_low_value <= 0                ;
+        output_precision_current_value <= 0                ;
+        dither_input_state <= 0                ;
+        dither_input_count <= 0                ;
+        dither_output_polarity <= 0                ;
+        dither_input_polarity <= 0                ;
+        dither_output_count <= 0                ;
         dac_output   <= 0                ;
-        dac_2nd_output
-                     <= 0                ;
+        dac_2nd_output <= 0                ;
     end
     else begin
         reset_pending <= reset_pending;
@@ -915,25 +918,17 @@ always@(posedge logic_clk or negedge rst)
                 sum_r3_yn3_r5_yn5         <= 0                ;
                 current_sum_total         <= 0                ;
                 delay_counter<= 0                ;
-                delay_counter_intermediate
-                             <= 0                ;
+                delay_counter_intermediate <= 0                ;
                 y_average_sum<= 0                ;
-                output_counter_1_limit 
-                             <= 0                ;
-                output_precision_low_value
-                             <= 0                ;
-                output_precision_high_value
-                             <= 0                ;
-                output_precision_current_value
-                             <= 0                ;
+                output_counter_1_limit <= 0                ;
+                output_precision_low_value <= 0                ;
+                output_precision_high_value <= 0                ;
+                output_precision_current_value <= 0                ;
                 reset_pending<= 0                ;
 
-                dither_output_polarity
-                             <= 0                ;
-                dither_input_state 
-                             <= 5'b00000         ;
-                integral_2nd_sum  
-                             <= 0                ;
+                dither_output_polarity <= 0                ;
+                dither_input_state <= 5'b00000         ;
+                integral_2nd_sum <= 0                ;
                 integral_sum <= 0                ;
             end
             //
@@ -1151,6 +1146,7 @@ always@(posedge logic_clk or negedge rst)
                 if      (z_n_raw < DAC_MIN) reg_o_z_n <= DAC_MIN;
                 else if (z_n_raw > DAC_MAX) reg_o_z_n <= DAC_MAX;
                 else                          reg_o_z_n <= z_n_raw;
+                dac_output_out <= dac_output;
             end
 
             //
@@ -1700,5 +1696,15 @@ assign o_test_3 = y_input_raw_1;
 assign o_test_4 = y_input_raw_2;
 assign o_test_5 = y_input;
 assign o_test_6 = y_input_for_out;
+assign o_test_7 = current_sum_shifted_rebased;
+assign o_test_8 = dither_output_polarity;
+assign o_test_9 = dither_output_count;
+assign o_test_10 = dac_output_out;
+assign o_test_11 = 0;
+assign o_test_12 = 0;
+assign o_test_13 = 0;
+assign o_test_14 = 0;
+assign o_test_15 = 0;
+assign o_test_16 = 0;
 
 endmodule
