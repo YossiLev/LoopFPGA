@@ -426,6 +426,32 @@ module pid_top(
   wire   [31:0] pid_o_test_14;
   wire   [31:0] pid_o_test_15;
   wire   [31:0] pid_o_test_16;
+
+  //
+  // Recorder (i3 bus) signals.
+  // i3_cs[0] write : {[8]=enable, [7:4]=rec_index_B, [3:0]=rec_index_A}
+  // i3_cs[1] write : [9:0] = rec_read_addr
+  // i3_cs[2] write : [31:0] = rec_interval  (1=every tick, N=every Nth tick)
+  // i3_cs[3] read  : buf_A[rec_read_addr]
+  // i3_cs[4] read  : buf_B[rec_read_addr]
+  // i3_cs[5] read  : {21'b0, rec_counter[9:0], rec_enable}
+  //
+  // NOTE: connect these to soc_system PIO ports when the Qsys/Platform Designer
+  //       project is updated.  Until then they are stubbed out below.
+  //
+  wire   [15:0] pid_recorder_i3_cs        ;
+  wire          pid_recorder_i3_write      ;
+  wire          pid_recorder_i3_read       ;
+  wire   [31:0] pid_recorder_i3_data_in   ;
+  wire   [31:0] pid_recorder_o3_data_out  ;
+  wire   [31:0] pid_recorder_o3_status    ;
+
+  assign pid_recorder_i3_cs      = soc_system_recorder_i3_cs;
+  assign pid_recorder_i3_write   = soc_system_recorder_i3_write;
+  assign pid_recorder_i3_read    = soc_system_recorder_i3_read;
+  assign pid_recorder_i3_data_in = soc_system_recorder_i3_data_in;
+  assign soc_system_recorder_o3_data_out = pid_recorder_o3_data_out;
+  assign soc_system_recorder_o3_status   = pid_recorder_o3_status;
 	
   wire   [13:0] cpu_dac_a_output ;
   wire   [13:0] cpu_dac_b_output ; 
@@ -687,8 +713,13 @@ module pid_top(
         .pid_o_test_13_external_connection_in_port                 (pid_o_test_13),
         .pid_o_test_14_external_connection_in_port                 (pid_o_test_14),
         .pid_o_test_15_external_connection_in_port                 (pid_o_test_15),
-		  
-		
+        .pid_o_test_16_external_connection_in_port                 (pid_o_test_16),		  
+			  .recorder_i3_cs_external_connection_export          (soc_system_recorder_i3_cs),
+	      .recorder_i3_write_external_connection_export          (soc_system_recorder_i3_write),
+	      .recorder_i3_read_external_connection_export          (soc_system_recorder_i3_read),
+	      .recorder_i3_data_in_external_connection_export          (soc_system_recorder_i3_data_in),
+	      .recorder_o3_data_out_external_connection_export          (soc_system_recorder_o3_data_out),
+	      .recorder_o3_status_external_connection_export          (soc_system_recorder_o3_status)
     );
   
 // Source/Probe megawizard instance
@@ -924,7 +955,16 @@ predictor  pid_6_predictor (
       .o_test_13(pid_o_test_13),
       .o_test_14(pid_o_test_14),
       .o_test_15(pid_o_test_15),
-      .o_test_16(pid_o_test_16)
+      .o_test_16(pid_o_test_16),
+
+        // ---- Recorder (i3 bus) ----
+        .i3_cs       ( pid_recorder_i3_cs      ),
+        .i3_write    ( pid_recorder_i3_write    ),
+        .i3_read     ( pid_recorder_i3_read     ),
+        .i3_data_in  ( pid_recorder_i3_data_in  ),
+        .o3_data_out ( pid_recorder_o3_data_out ),
+        .o3_recorder_status
+                     ( pid_recorder_o3_status   )
 );    
 
 

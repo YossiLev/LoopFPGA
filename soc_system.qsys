@@ -1056,6 +1056,102 @@
          type = "String";
       }
    }
+   element recorder_i3_cs
+   {
+      datum _sortIndex
+      {
+         value = "67";
+         type = "int";
+      }
+   }
+   element recorder_i3_cs.s1
+   {
+      datum baseAddress
+      {
+         value = "944";
+         type = "String";
+      }
+   }
+   element recorder_i3_data_in
+   {
+      datum _sortIndex
+      {
+         value = "70";
+         type = "int";
+      }
+   }
+   element recorder_i3_data_in.s1
+   {
+      datum baseAddress
+      {
+         value = "992";
+         type = "String";
+      }
+   }
+   element recorder_i3_read
+   {
+      datum _sortIndex
+      {
+         value = "69";
+         type = "int";
+      }
+   }
+   element recorder_i3_read.s1
+   {
+      datum baseAddress
+      {
+         value = "976";
+         type = "String";
+      }
+   }
+   element recorder_i3_write
+   {
+      datum _sortIndex
+      {
+         value = "68";
+         type = "int";
+      }
+   }
+   element recorder_i3_write.s1
+   {
+      datum baseAddress
+      {
+         value = "960";
+         type = "String";
+      }
+   }
+   element recorder_o3_data_out
+   {
+      datum _sortIndex
+      {
+         value = "71";
+         type = "int";
+      }
+   }
+   element recorder_o3_data_out.s1
+   {
+      datum baseAddress
+      {
+         value = "1008";
+         type = "String";
+      }
+   }
+   element recorder_o3_status
+   {
+      datum _sortIndex
+      {
+         value = "72";
+         type = "int";
+      }
+   }
+   element recorder_o3_status.s1
+   {
+      datum baseAddress
+      {
+         value = "1024";
+         type = "String";
+      }
+   }
    element soc_system
    {
       datum _originalDeviceFamily
@@ -1428,6 +1524,36 @@
  <interface
    name="pid_version_external_connection"
    internal="pid_version.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="recorder_i3_cs_external_connection"
+   internal="recorder_i3_cs.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="recorder_i3_data_in_external_connection"
+   internal="recorder_i3_data_in.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="recorder_i3_read_external_connection"
+   internal="recorder_i3_read.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="recorder_i3_write_external_connection"
+   internal="recorder_i3_write.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="recorder_o3_data_out_external_connection"
+   internal="recorder_o3_data_out.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="recorder_o3_status_external_connection"
+   internal="recorder_o3_status.external_connection"
    type="conduit"
    dir="end" />
  <interface name="reset" internal="clk_0.clk_in_reset" type="reset" dir="end" />
@@ -3102,6 +3228,114 @@
   <parameter name="width" value="32" />
  </module>
  <module
+   name="recorder_i3_cs"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="16" />
+ </module>
+ <module
+   name="recorder_i3_data_in"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="recorder_i3_read"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="1" />
+ </module>
+ <module
+   name="recorder_i3_write"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="1" />
+ </module>
+ <module
+   name="recorder_o3_data_out"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="recorder_o3_status"
+   kind="altera_avalon_pio"
+   version="25.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
    name="sysid_qsys"
    kind="altera_avalon_sysid_qsys"
    version="25.1"
@@ -3669,6 +3903,60 @@
  <connection
    kind="avalon"
    version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="recorder_i3_cs.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x03b0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="recorder_i3_write.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x03c0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="recorder_i3_read.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x03d0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="recorder_i3_data_in.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x03e0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="recorder_o3_status.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0400" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
+   start="hps_0.h2f_lw_axi_master"
+   end="recorder_o3_data_out.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x03f0" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="25.1"
    start="fpga_only_master.master"
    end="jtag_uart.avalon_jtag_slave">
   <parameter name="arbitrationPriority" value="1" />
@@ -3874,6 +4162,36 @@
  <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_14.clk" />
  <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_15.clk" />
  <connection kind="clock" version="25.1" start="clk_0.clk" end="pid_o_test_16.clk" />
+ <connection
+   kind="clock"
+   version="25.1"
+   start="clk_0.clk"
+   end="recorder_i3_cs.clk" />
+ <connection
+   kind="clock"
+   version="25.1"
+   start="clk_0.clk"
+   end="recorder_i3_write.clk" />
+ <connection
+   kind="clock"
+   version="25.1"
+   start="clk_0.clk"
+   end="recorder_i3_read.clk" />
+ <connection
+   kind="clock"
+   version="25.1"
+   start="clk_0.clk"
+   end="recorder_i3_data_in.clk" />
+ <connection
+   kind="clock"
+   version="25.1"
+   start="clk_0.clk"
+   end="recorder_o3_status.clk" />
+ <connection
+   kind="clock"
+   version="25.1"
+   start="clk_0.clk"
+   end="recorder_o3_data_out.clk" />
  <connection
    kind="clock"
    version="25.1"
@@ -4228,6 +4546,36 @@
    version="25.1"
    start="clk_0.clk_reset"
    end="pid_o_test_16.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="recorder_i3_cs.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="recorder_i3_write.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="recorder_i3_read.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="recorder_i3_data_in.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="recorder_o3_status.reset" />
+ <connection
+   kind="reset"
+   version="25.1"
+   start="clk_0.clk_reset"
+   end="recorder_o3_data_out.reset" />
  <connection
    kind="reset"
    version="25.1"
