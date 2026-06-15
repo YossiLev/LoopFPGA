@@ -289,14 +289,78 @@ module predictor
 function [31:0] recorder_mux;
     input [5:0] sel;
     case (sel)
-        4'd0:    recorder_mux = y_n;
-        4'd1:    recorder_mux = y_n_1;
-        4'd2:    recorder_mux = y_n_2;
-        4'd3:    recorder_mux = y_n_3;
-        4'd4:    recorder_mux = integral_sum[31:0];
-        4'd5:    recorder_mux = dac_output;
-        4'd6:    recorder_mux = y_input;
-        4'd7:    recorder_mux = current_sum_total[31:0];
+        4'd0:    recorder_mux = o_magic;
+        4'd1:    recorder_mux = o_magic;
+        4'd2:    recorder_mux = o_count;
+        4'd3:    recorder_mux = o_y_n;
+        4'd4:    recorder_mux = o_q0_q4;
+        4'd5:    recorder_mux = o_q1_q5;
+        4'd6:    recorder_mux = o_q2_q6;
+        4'd7:    recorder_mux = o_q3_q7;
+        4'd8:    recorder_mux = o_config;
+        4'd9:    recorder_mux = o_y_reference;
+
+        4'd10:   recorder_mux = o_i0;
+        4'd11:   recorder_mux = o_z_n;
+        4'd12:   recorder_mux = o_count;
+        4'd13:   recorder_mux = o_y_n_3;
+        4'd14:   recorder_mux = o_delay_count;
+        4'd15:   recorder_mux = o_delay_counter;
+        4'd16:   recorder_mux = o_out_offset;
+        4'd17:   recorder_mux = o_magic;
+        4'd18:   recorder_mux = o_magic;
+        4'd19:   recorder_mux = o2_dither_config_1;
+
+        4'd20:   recorder_mux = o2_dither_config_2;
+        4'd21:   recorder_mux = o2_dither_config_3;
+        4'd22:   recorder_mux = o2_dither_count_1;
+        4'd23:   recorder_mux = o2_dither_count_2;
+        4'd24:   recorder_mux = o2_dither_count_3;
+        4'd25:   recorder_mux = o2_2nd_out_offset;
+        4'd26:   recorder_mux = o2_2nd_config;
+        4'd27:   recorder_mux = o2_3rd_config;
+        4'd28:   recorder_mux = o2_y_n_4;
+        4'd29:   recorder_mux = o2_y_n_5;
+
+        4'd30:   recorder_mux = o2_y_n_6;
+        4'd31:   recorder_mux = o2_y_n_7;
+        4'd32:   recorder_mux = o2_y_n_7;
+        4'd33:   recorder_mux = o2_manual_dac_output;
+        4'd34:   recorder_mux = o_y_input;
+        4'd35:   recorder_mux = o_magic;
+        4'd36:   recorder_mux = o_magic;
+        4'd37:   recorder_mux = o_debug_reg1;
+        4'd38:   recorder_mux = o_pre_dither_manual_value;
+        4'd39:   recorder_mux = o_current_sum_before_rebase;
+
+        4'd40:   recorder_mux = o_current_total_sum_low;
+        4'd41:   recorder_mux = o_current_total_sum_high;
+        4'd42:   recorder_mux = o_dac_output;
+        4'd43:   recorder_mux = o_test_1;
+        4'd44:   recorder_mux = o_test_2;
+        4'd45:   recorder_mux = o_test_3;
+        4'd46:   recorder_mux = o_test_4;
+        4'd47:   recorder_mux = o_test_5;
+        4'd48:   recorder_mux = o_test_6;
+        4'd49:   recorder_mux = o_test_7;
+
+        4'd50:   recorder_mux = o_test_8;
+        4'd51:   recorder_mux = o_test_9;
+        4'd52:   recorder_mux = o_test_10;
+        4'd53:   recorder_mux = o_test_11;
+        4'd54:   recorder_mux = o_test_12;
+        4'd55:   recorder_mux = o_test_13;
+        4'd56:   recorder_mux = o_test_14;
+        4'd57:   recorder_mux = o_test_15;
+        4'd58:   recorder_mux = o_test_16;
+        4'd59:   recorder_mux = i3_cs;
+         
+        4'd60:   recorder_mux = i3_write;
+        4'd61:   recorder_mux = i3_read;
+        4'd62:   recorder_mux = i3_data_in;
+        4'd63:   recorder_mux = o3_data_out;
+        4'd64:   recorder_mux = o3_recorder_status;
+
         default: recorder_mux = 32'b0;
     endcase
 endfunction
@@ -304,22 +368,14 @@ endfunction
 // Capture configuration (written from reg_clk domain, read in logic_clk domain).
 // These are intentionally simple registers; no explicit CDC handshake is added
 // here — add one if your reg_clk and logic_clk are asynchronous to each other.
-reg  [5:0]  rec_index_A;       // Source index for buffer A (see recorder_mux)
-reg  [5:0]  rec_index_B;       // Source index for buffer B
-reg         rec_enable;        // SW enable flag. Owned ONLY by reg_clk always block.
-                               // SW sets to 1 to arm, reads 0 when capture is done.
-reg         rec_active;        // Capture-in-progress flag. Owned ONLY by logic_clk.
-                               // Set on rising edge of synchronized rec_enable.
-                               // Cleared when buffer is full.
-                               // SW reads rec_enable (not rec_active) for status.
-reg  [9:0]  rec_counter;       // Capture write pointer (0..1023). Owned by logic_clk.
-reg  [9:0]  rec_read_addr;     // Read pointer set by SW for bus readback. Owned by reg_clk.
-reg  [31:0] rec_interval;      // Clock-divider: write one sample every rec_interval ticks.
-reg  [31:0] rec_tick_counter;  // Counts ticks between writes. Owned by logic_clk.
-// Status flag fed back to reg_clk domain via 2-flop synchronizer
-reg         rec_active_sync_0; // CDC sync stage 1 (logic_clk → reg_clk). Owned by reg_clk.
-reg         rec_active_sync_1; // CDC sync stage 2. Owned by reg_clk.
-reg         rec_active_sync_1_prev; // Edge detector for falling edge of rec_active_sync_1.
+reg  [5:0]  rec_index_A;
+reg  [5:0]  rec_index_B;
+reg         rec_enable;        // owned exclusively by reg_clk
+reg         rec_active;        // owned exclusively by logic_clk
+reg  [9:0]  rec_counter;       // owned by logic_clk
+reg  [9:0]  rec_read_addr;     // owned by reg_clk
+reg  [31:0] rec_interval;      // owned by reg_clk
+reg  [31:0] rec_tick_counter;  // owned by logic_clk
 
 // The two capture buffers.  The synthesis tool will infer these as Block RAM
 // provided you do not read and write the same address in the same cycle
@@ -328,9 +384,9 @@ reg         rec_active_sync_1_prev; // Edge detector for falling edge of rec_act
 reg [31:0]  recorder_buf_A [0:1023];
 reg [31:0]  recorder_buf_B [0:1023];
 
-// Status word: bit[0] = capture active (synchronized back to reg_clk domain),
-//              bits[10:1] = current write pointer.
-assign o3_recorder_status = {21'b0, rec_counter, rec_active_sync_1};
+// Status word driven to the output port
+// bit[0] = rec_active (capture running), bits[10:1] = rec_counter
+assign o3_recorder_status = {21'b0, rec_counter, rec_active};
 
 //
 // ---------------------------------------------------------------
@@ -1797,11 +1853,14 @@ assign o_test_16 = 0;
 // ---------------------------------------------------------------
 // Recorder — reg_clk domain
 // Owns: rec_enable, rec_index_A/B, rec_interval, rec_read_addr,
-//       rec_active_sync_0/1 (CDC of rec_active back to reg_clk),
+//       rec_active_s0/s1 (2-flop CDC of rec_active → reg_clk),
 //       o3_data_out.
-// Does NOT touch: rec_active, rec_counter, rec_tick_counter
-//                 (those belong to logic_clk).
+// Never writes: rec_active, rec_counter, rec_tick_counter.
 // ---------------------------------------------------------------
+reg rec_active_s0;  // CDC stage 1: rec_active sampled into reg_clk
+reg rec_active_s1;  // CDC stage 2: stable in reg_clk domain
+reg rec_active_s1_prev; // edge detector
+
 always @(posedge reg_clk or negedge rst)
 begin
     if (!rst)
@@ -1811,22 +1870,21 @@ begin
         rec_enable       <= 1'b0;
         rec_read_addr    <= 10'b0;
         rec_interval     <= 32'd1;
-        rec_active_sync_0    <= 1'b0;
-        rec_active_sync_1    <= 1'b0;
-        rec_active_sync_1_prev <= 1'b0;
+        rec_active_s0    <= 1'b0;
+        rec_active_s1    <= 1'b0;
+        rec_active_s1_prev <= 1'b0;
         o3_data_out      <= 32'b0;
     end
     else
     begin
-        // 2-flop CDC: bring rec_active (logic_clk) into reg_clk domain
-        rec_active_sync_0      <= rec_active;
-        rec_active_sync_1      <= rec_active_sync_0;
-        rec_active_sync_1_prev <= rec_active_sync_1;
+        // 2-flop CDC: rec_active (logic_clk) → reg_clk
+        rec_active_s0      <= rec_active;
+        rec_active_s1      <= rec_active_s0;
+        rec_active_s1_prev <= rec_active_s1;
 
-        // Auto-clear rec_enable on the falling edge of rec_active_sync_1
-        // (i.e. capture just finished). Using edge detection avoids
-        // clearing rec_enable at startup or before capture has begun.
-        if (rec_active_sync_1_prev && !rec_active_sync_1)
+        // Clear rec_enable on falling edge of rec_active
+        // (capture just finished). Edge detect avoids clearing at startup.
+        if (rec_active_s1_prev && !rec_active_s1)
             rec_enable <= 1'b0;
 
         // ---- writes ----
@@ -1851,10 +1909,8 @@ begin
         begin
             if (i3_cs[3])
                 o3_data_out <= recorder_buf_A[rec_read_addr];
-
             if (i3_cs[4])
                 o3_data_out <= recorder_buf_B[rec_read_addr];
-
             if (i3_cs[5])
                 o3_data_out <= o3_recorder_status;
         end
@@ -1863,73 +1919,64 @@ end
 
 
 // ---------------------------------------------------------------
-// ---------------------------------------------------------------
 // Recorder capture — logic_clk domain
 // Owns: rec_active, rec_counter, rec_tick_counter,
-//       rec_enable_sync_0/1 (CDC of rec_enable into logic_clk).
-// Does NOT touch: rec_enable (owned by reg_clk).
+//       rec_en_s0/s1/prev (2-flop CDC of rec_enable → logic_clk).
+// Never writes: rec_enable (owned by reg_clk).
 //
-// How it works:
-//   rec_enable (reg_clk) is synchronized into logic_clk via
-//   rec_enable_sync_0/1. A rising edge starts the capture
-//   (resets counters, sets rec_active). Capture runs until
-//   rec_counter reaches 1023, then rec_active is cleared.
-//   reg_clk sees rec_active drop via rec_active_sync_0/1 and
-//   clears rec_enable — completing the handshake.
+// rec_enable (reg_clk) is synchronized in via 2-flop chain.
+// Rising edge → arm capture (reset counters, set rec_active).
+// Capture runs independently of rec_enable after arming.
+// When rec_counter hits 1023, rec_active is cleared.
+// reg_clk sees rec_active drop and clears rec_enable.
 // ---------------------------------------------------------------
-reg rec_enable_sync_0;
-reg rec_enable_sync_1;
-reg rec_enable_prev;
+reg rec_en_s0;    // CDC stage 1: rec_enable sampled into logic_clk
+reg rec_en_s1;    // CDC stage 2: stable in logic_clk domain
+reg rec_en_prev;  // edge detector
 
 always @(posedge logic_clk or negedge rst)
 begin
     if (!rst)
     begin
-        rec_enable_sync_0 <= 1'b0;
-        rec_enable_sync_1 <= 1'b0;
-        rec_enable_prev   <= 1'b0;
-        rec_active        <= 1'b0;
-        rec_counter       <= 10'b0;
-        rec_tick_counter  <= 32'b0;
+        rec_en_s0        <= 1'b0;
+        rec_en_s1        <= 1'b0;
+        rec_en_prev      <= 1'b0;
+        rec_active       <= 1'b0;
+        rec_counter      <= 10'b0;
+        rec_tick_counter <= 32'b0;
     end
     else
     begin
-        // 2-flop CDC: bring rec_enable (reg_clk) into logic_clk domain
-        rec_enable_sync_0 <= rec_enable;
-        rec_enable_sync_1 <= rec_enable_sync_0;
-        rec_enable_prev   <= rec_enable_sync_1;
+        // 2-flop CDC: rec_enable (reg_clk) → logic_clk
+        rec_en_s0   <= rec_enable;
+        rec_en_s1   <= rec_en_s0;
+        rec_en_prev <= rec_en_s1;
 
-        // Rising edge of synchronized rec_enable — arm the capture
-        if (rec_enable_sync_1 && !rec_enable_prev)
+        // Rising edge of synchronized rec_enable → start capture
+        if (rec_en_s1 && !rec_en_prev)
         begin
             rec_active       <= 1'b1;
-                rec_counter      <= 10'b0;
-                rec_tick_counter <= 32'b0;
-            end
+            rec_counter      <= 10'b0;
+            rec_tick_counter <= 32'b0;
+        end
 
-        // Run capture while active
+        // Capture runs until buffer full, independent of rec_enable
         if (rec_active)
         begin
             if (rec_tick_counter >= rec_interval - 32'd1)
             begin
                 // Interval elapsed — write a sample
-                // recorder_buf_A[rec_counter] <= recorder_mux(rec_index_A);
-                // recorder_buf_B[rec_counter] <= recorder_mux(rec_index_B);
-                recorder_buf_A[rec_counter] <= rec_index_A;
-                recorder_buf_B[rec_counter] <= rec_index_B;
+                recorder_buf_A[rec_counter] <= recorder_mux(rec_index_A);
+                recorder_buf_B[rec_counter] <= recorder_mux(rec_index_B);
+                // recorder_buf_A[rec_counter] <= 6'b1;
+                // recorder_buf_B[rec_counter] <= rec_index_B;
 
                 rec_tick_counter <= 32'b0;
 
                 if (rec_counter == 10'd1023)
-                begin
-                // Buffer full — deactivate. rec_enable will be cleared
-                // by reg_clk once it sees rec_active drop.
-                rec_active <= 1'b0;
-                end
+                    rec_active <= 1'b0;  // done — never touches rec_enable
                 else
-                begin
                     rec_counter <= rec_counter + 10'b1;
-                end
             end
             else
             begin
