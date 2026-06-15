@@ -426,7 +426,12 @@ module pid_top(
   wire   [31:0] pid_o_test_14;
   wire   [31:0] pid_o_test_15;
   wire   [31:0] pid_o_test_16;
-
+  wire   [15:0] soc_system_recorder_i3_cs        ;
+  wire          soc_system_recorder_i3_write      ;
+  wire          soc_system_recorder_i3_read       ;
+  wire   [31:0] soc_system_recorder_i3_data_in   ;
+  wire   [31:0] soc_system_recorder_o3_data_out  ;
+  wire   [31:0] soc_system_recorder_o3_status    ;
   //
   // Recorder (i3 bus) signals.
   // i3_cs[0] write : {[8]=enable, [7:4]=rec_index_B, [3:0]=rec_index_A}
