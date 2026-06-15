@@ -289,77 +289,77 @@ module predictor
 function [31:0] recorder_mux;
     input [5:0] sel;
     case (sel)
-        4'd0:    recorder_mux = o_magic;
-        4'd1:    recorder_mux = o_magic;
-        4'd2:    recorder_mux = o_count;
-        4'd3:    recorder_mux = o_y_n;
-        4'd4:    recorder_mux = o_q0_q4;
-        4'd5:    recorder_mux = o_q1_q5;
-        4'd6:    recorder_mux = o_q2_q6;
-        4'd7:    recorder_mux = o_q3_q7;
-        4'd8:    recorder_mux = o_config;
-        4'd9:    recorder_mux = o_y_reference;
+        6'd0:    recorder_mux = o_magic;
+        6'd1:    recorder_mux = o_magic;
+        6'd2:    recorder_mux = o_count;
+        6'd3:    recorder_mux = o_y_n;
+        6'd4:    recorder_mux = o_q0_q4;
+        6'd5:    recorder_mux = o_q1_q5;
+        6'd6:    recorder_mux = o_q2_q6;
+        6'd7:    recorder_mux = o_q3_q7;
+        6'd8:    recorder_mux = o_config;
+        6'd9:    recorder_mux = o_y_reference;
 
-        4'd10:   recorder_mux = o_i0;
-        4'd11:   recorder_mux = o_z_n;
-        4'd12:   recorder_mux = o_count;
-        4'd13:   recorder_mux = o_y_n_3;
-        4'd14:   recorder_mux = o_delay_count;
-        4'd15:   recorder_mux = o_delay_counter;
-        4'd16:   recorder_mux = o_out_offset;
-        4'd17:   recorder_mux = o_magic;
-        4'd18:   recorder_mux = o_magic;
-        4'd19:   recorder_mux = o2_dither_config_1;
+        6'd10:   recorder_mux = o_i0;
+        6'd11:   recorder_mux = o_z_n;
+        6'd12:   recorder_mux = o_count;
+        6'd13:   recorder_mux = o_y_n_3;
+        6'd14:   recorder_mux = o_delay_count;
+        6'd15:   recorder_mux = o_delay_counter;
+        6'd16:   recorder_mux = o_out_offset;
+        6'd17:   recorder_mux = o_magic;
+        6'd18:   recorder_mux = o_magic;
+        6'd19:   recorder_mux = o2_dither_config_1;
 
-        4'd20:   recorder_mux = o2_dither_config_2;
-        4'd21:   recorder_mux = o2_dither_config_3;
-        4'd22:   recorder_mux = o2_dither_count_1;
-        4'd23:   recorder_mux = o2_dither_count_2;
-        4'd24:   recorder_mux = o2_dither_count_3;
-        4'd25:   recorder_mux = o2_2nd_out_offset;
-        4'd26:   recorder_mux = o2_2nd_config;
-        4'd27:   recorder_mux = o2_3rd_config;
-        4'd28:   recorder_mux = o2_y_n_4;
-        4'd29:   recorder_mux = o2_y_n_5;
+        6'd20:   recorder_mux = o2_dither_config_2;
+        6'd21:   recorder_mux = o2_dither_config_3;
+        6'd22:   recorder_mux = o2_dither_count_1;
+        6'd23:   recorder_mux = o2_dither_count_2;
+        6'd24:   recorder_mux = o2_dither_count_3;
+        6'd25:   recorder_mux = o2_2nd_out_offset;
+        6'd26:   recorder_mux = o2_2nd_config;
+        6'd27:   recorder_mux = o2_3rd_config;
+        6'd28:   recorder_mux = o2_y_n_4;
+        6'd29:   recorder_mux = o2_y_n_5;
 
-        4'd30:   recorder_mux = o2_y_n_6;
-        4'd31:   recorder_mux = o2_y_n_7;
-        4'd32:   recorder_mux = o2_y_n_7;
-        4'd33:   recorder_mux = o2_manual_dac_output;
-        4'd34:   recorder_mux = o_y_input;
-        4'd35:   recorder_mux = o_magic;
-        4'd36:   recorder_mux = o_magic;
-        4'd37:   recorder_mux = o_debug_reg1;
-        4'd38:   recorder_mux = o_pre_dither_manual_value;
-        4'd39:   recorder_mux = o_current_sum_before_rebase;
+        6'd30:   recorder_mux = o2_y_n_6;
+        6'd31:   recorder_mux = o2_y_n_7;
+        6'd32:   recorder_mux = o2_y_n_7;
+        6'd33:   recorder_mux = o2_manual_dac_output;
+        6'd34:   recorder_mux = o_y_input;
+        6'd35:   recorder_mux = o_magic;
+        6'd36:   recorder_mux = o_magic;
+        6'd37:   recorder_mux = o_debug_reg1;
+        6'd38:   recorder_mux = o_pre_dither_manual_value;
+        6'd39:   recorder_mux = o_current_sum_before_rebase;
 
-        4'd40:   recorder_mux = o_current_total_sum_low;
-        4'd41:   recorder_mux = o_current_total_sum_high;
-        4'd42:   recorder_mux = o_dac_output;
-        4'd43:   recorder_mux = o_test_1;
-        4'd44:   recorder_mux = o_test_2;
-        4'd45:   recorder_mux = o_test_3;
-        4'd46:   recorder_mux = o_test_4;
-        4'd47:   recorder_mux = o_test_5;
-        4'd48:   recorder_mux = o_test_6;
-        4'd49:   recorder_mux = o_test_7;
+        6'd40:   recorder_mux = o_current_total_sum_low;
+        6'd41:   recorder_mux = o_current_total_sum_high;
+        6'd42:   recorder_mux = o_dac_output;
+        6'd43:   recorder_mux = o_test_1;
+        6'd44:   recorder_mux = o_test_2;
+        6'd45:   recorder_mux = o_test_3;
+        6'd46:   recorder_mux = o_test_4;
+        6'd47:   recorder_mux = o_test_5;
+        6'd48:   recorder_mux = o_test_6;
+        6'd49:   recorder_mux = o_test_7;
 
-        4'd50:   recorder_mux = o_test_8;
-        4'd51:   recorder_mux = o_test_9;
-        4'd52:   recorder_mux = o_test_10;
-        4'd53:   recorder_mux = o_test_11;
-        4'd54:   recorder_mux = o_test_12;
-        4'd55:   recorder_mux = o_test_13;
-        4'd56:   recorder_mux = o_test_14;
-        4'd57:   recorder_mux = o_test_15;
-        4'd58:   recorder_mux = o_test_16;
-        4'd59:   recorder_mux = i3_cs;
+        6'd50:   recorder_mux = o_test_8;
+        6'd51:   recorder_mux = o_test_9;
+        6'd52:   recorder_mux = o_test_10;
+        6'd53:   recorder_mux = o_test_11;
+        6'd54:   recorder_mux = o_test_12;
+        6'd55:   recorder_mux = o_test_13;
+        6'd56:   recorder_mux = o_test_14;
+        6'd57:   recorder_mux = o_test_15;
+        6'd58:   recorder_mux = o_test_16;
+        6'd59:   recorder_mux = i3_cs;
          
-        4'd60:   recorder_mux = i3_write;
-        4'd61:   recorder_mux = i3_read;
-        4'd62:   recorder_mux = i3_data_in;
-        4'd63:   recorder_mux = o3_data_out;
-        4'd64:   recorder_mux = o3_recorder_status;
+        6'd60:   recorder_mux = i3_write;
+        6'd61:   recorder_mux = i3_read;
+        6'd62:   recorder_mux = i3_data_in;
+        6'd63:   recorder_mux = o3_data_out;
+        6'd64:   recorder_mux = o3_recorder_status;
 
         default: recorder_mux = 32'b0;
     endcase
@@ -656,7 +656,6 @@ reg  [31:0]  reg_o_z_n                  ;
 reg  [31:0]  dac_2nd_output             ;
 
 
-
 mult_32_32  mult_r0_y_n   (  .clock(logic_clk), .dataa(r0), .datab(y_n  ), .result(w_r0_y_n   )   ) ;     
 mult_32_32  mult_r1_y_n_1 (  .clock(logic_clk), .dataa(r1), .datab(y_n_1), .result(w_r1_y_n_1 )   ) ;
 mult_32_32  mult_r2_y_n_2 (  .clock(logic_clk), .dataa(r2), .datab(y_n_2), .result(w_r2_y_n_2 )   ) ;
@@ -744,11 +743,8 @@ always@(posedge reg_clk or negedge rst)
 
             if (i_cs[2])
             begin
-                // r0 <= { {16{i_q0_q4[15]}}, i_q0_q4[15:0] };
                 r1 <= {{16{i_q1_q5[15]}}, i_q1_q5[15:0]};
                 r5 <= {{16{i_q1_q5[31]}}, i_q1_q5[31:16]};
-                // r1 <= {16*i_q1_q5[15], i_q1_q5[15:0]};
-                // r5 <= {16*i_q1_q5[31], i_q1_q5[31:16]};
             end
 
             if (i_cs[3])
@@ -959,8 +955,8 @@ reg       signed [31:0]   y_input_raw_1;
 reg       signed [31:0]   y_input_raw_2;
 
         
-localparam signed [31:0] DAC_MIN = 32'sd50;
-localparam signed [31:0] DAC_MAX = 32'sd16350;
+localparam signed [31:0] DAC_MIN = 32'sd0;
+localparam signed [31:0] DAC_MAX = 32'sd16383;
 
 
 //
