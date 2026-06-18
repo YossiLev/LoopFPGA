@@ -1423,14 +1423,6 @@ always@(posedge logic_clk or negedge rst)
             y_n_2  <= save_y_n_1 ;
             y_n_1  <= save_y_n   ;
           
-            if (input_averaging_enable)
-            begin
-                y_n <= (invert_y_n ? ~y_average_sum : y_average_sum);
-            end
-            else
-            begin
-                y_n <= (invert_y_n ? ~y_input_for_yn       : y_input_for_yn      );
-            end
 
             if (!pre_dither_manual_value)
             begin
@@ -1477,6 +1469,14 @@ always@(posedge logic_clk or negedge rst)
             end
             else
             begin
+                if (input_averaging_enable)
+                begin
+                    y_n <= (invert_y_n ? ~y_average_sum : y_average_sum);
+                end
+                else
+                begin
+                    y_n <= (invert_y_n ? ~y_input_for_yn       : y_input_for_yn      );
+                end
                 //
                 // State machine returning to its original state:
                 // 1. If can continue rolling, move straight to state #1
@@ -1648,7 +1648,7 @@ always@(posedge logic_clk or negedge rst)
             // regardless of pre-dither manual or standard input,
             // we ik the dither output state (if dither output is enabled)
             //
-            if (dither_input_enable)
+            if (dither_output_enable)
             begin
                 if (dither_output_count >= dither_output_init_count)
                 begin
@@ -1688,15 +1688,6 @@ always@(posedge logic_clk or negedge rst)
             end
 
 
-            if (input_averaging_enable)
-            begin
-                y_n <= (invert_y_n ? ~y_average_sum : y_average_sum);
-            end
-            else
-            begin
-                y_n <= (invert_y_n ? ~y_input_for_yn       : y_input_for_yn      );
-            end
-
             //
             // 2nd take of y_input in a single predictor 4 cycle operation
             // (if more than 4 cycles, this is taken again in state 6).
@@ -1711,6 +1702,15 @@ always@(posedge logic_clk or negedge rst)
                 end
             else
                 begin
+                    if (input_averaging_enable)
+                    begin
+                        y_n <= (invert_y_n ? ~y_average_sum : y_average_sum);
+                    end
+                    else
+                    begin
+                        y_n <= (invert_y_n ? ~y_input_for_yn : y_input_for_yn      );
+                    end
+
                     //
                     // State machine returning to its original state:
                     // 1. If can continue rolling, move straight to state #1
