@@ -370,6 +370,8 @@ endfunction
 // here — add one if your reg_clk and logic_clk are asynchronous to each other.
 reg  [5:0]  rec_index_A;
 reg  [5:0]  rec_index_B;
+reg  [5:0]  rec_index_C;
+reg  [5:0]  rec_index_D;
 reg         rec_enable;        // owned exclusively by reg_clk
 reg         rec_active;        // owned exclusively by logic_clk
 reg  [9:0]  rec_counter;       // owned by logic_clk
@@ -383,6 +385,8 @@ reg  [31:0] rec_tick_counter;  // owned by logic_clk
 // registered on reg_clk via o3_data_out).
 reg [31:0]  recorder_buf_A [0:1023];
 reg [31:0]  recorder_buf_B [0:1023];
+reg [31:0]  recorder_buf_C [0:1023];
+reg [31:0]  recorder_buf_D [0:1023];
 
 // Status word driven to the output port
 // bit[0] = rec_active (capture running), bits[10:1] = rec_counter
@@ -1841,8 +1845,8 @@ assign o_test_10 = dac_output_out;
 assign o_test_11 = y_n_1;
 assign o_test_12 = y_n_2;
 assign o_test_13 = y_average_sum;
-assign o_test_14 = 0;
-assign o_test_15 = 0;
+assign o_test_14 = dither_input_polarity;
+assign o_test_15 = dither_input_count;
 assign o_test_16 = 0;
 
 
@@ -1863,6 +1867,8 @@ begin
     begin
         rec_index_A      <= 6'd0;
         rec_index_B      <= 6'd1;
+        rec_index_C      <= 6'd2;
+        rec_index_D      <= 6'd3;
         rec_enable       <= 1'b0;
         rec_read_addr    <= 10'b0;
         rec_interval     <= 32'd1;
@@ -1890,7 +1896,9 @@ begin
             begin
                 rec_index_A <= i3_data_in[5:0];
                 rec_index_B <= i3_data_in[11:6];
-                rec_enable  <= i3_data_in[12];
+                rec_index_C <= i3_data_in[17:12];
+                rec_index_D <= i3_data_in[23:18];
+                rec_enable  <= i3_data_in[24];
             end
 
             if (i3_cs[1])
@@ -1908,6 +1916,10 @@ begin
             if (i3_cs[4])
                 o3_data_out <= recorder_buf_B[rec_read_addr];
             if (i3_cs[5])
+                o3_data_out <= recorder_buf_C[rec_read_addr];
+            if (i3_cs[6])
+                o3_data_out <= recorder_buf_D[rec_read_addr];
+            if (i3_cs[7])
                 o3_data_out <= o3_recorder_status;
         end
     end
@@ -1964,7 +1976,9 @@ begin
                 // Interval elapsed — write a sample
                 recorder_buf_A[rec_counter] <= recorder_mux(rec_index_A);
                 recorder_buf_B[rec_counter] <= recorder_mux(rec_index_B);
-                // recorder_buf_A[rec_counter] <= 6'b1;
+                recorder_buf_C[rec_counter] <= recorder_mux(rec_index_C);
+                recorder_buf_D[rec_counter] <= recorder_mux(rec_index_D);
+
                 // recorder_buf_B[rec_counter] <= rec_index_B;
 
                 rec_tick_counter <= 32'b0;
