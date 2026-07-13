@@ -1846,8 +1846,8 @@ assign o_test_11 = y_n_1;
 assign o_test_12 = y_n_2;
 assign o_test_13 = y_average_sum;
 assign o_test_14 = dither_input_polarity;
-assign o_test_15 = dither_input_count;
-assign o_test_16 = 0;
+assign o_test_15 = integral_sum[31:0];
+assign o_test_16 = integral_sum[63:32];
 
 
 // ---------------------------------------------------------------
