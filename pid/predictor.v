@@ -451,7 +451,8 @@ reg   [31:0]    delay_counter_intermediate ;
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    sum_r0_yn_r2_yn2           ;
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    sum_r3_yn3_r5_yn5          ;
 
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    current_sum_total          ;    
+reg   [`INTERNAL_HIGH_ORDER_BIT:0]    current_sum_total          ;
+reg   [`INTERNAL_HIGH_ORDER_BIT:0]    gain_only_sum              ;
 reg   [31:0]    current_sum_shifted_before_rebase
                                            ;    
 reg   [31:0]    current_sum_shifted_before_rebase_2nd
@@ -1007,6 +1008,7 @@ always@(posedge logic_clk or negedge rst)
         sum_r0_yn_r2_yn2 <= 0                ;
         sum_r3_yn3_r5_yn5 <= 0                ;
         current_sum_total <= 0                ;
+        gain_only_sum <= 0                ;
         current_sum_shifted_before_rebase <= 0                ;
         current_sum_shifted_rebased <= 0                ;
         count_input  <= 32'b0            ;
@@ -1059,6 +1061,7 @@ always@(posedge logic_clk or negedge rst)
                 sum_r0_yn_r2_yn2         <= 0                ;
                 sum_r3_yn3_r5_yn5         <= 0                ;
                 current_sum_total         <= 0                ;
+                gain_only_sum              <= 0                ;
                 delay_counter<= 0                ;
                 delay_counter_intermediate <= 0                ;
                 y_average_sum<= 0                ;
@@ -1328,7 +1331,7 @@ always@(posedge logic_clk or negedge rst)
             //
             //                                                          |integral_sum after the latest summation |
             current_sum_total <= sum_r0_yn_r2_yn2 + sum_r3_yn3_r5_yn5 + (integral_sum + i0_y_n_shifted           );
-
+            gain_only_sum     <= sum_r0_yn_r2_yn2 + sum_r3_yn3_r5_yn5;
             //
             // Propagate input dithering
             //
@@ -1836,7 +1839,7 @@ assign o_test_1 = i_yn1;
 assign o_test_2 = i_yn2;
 assign o_test_3 = y_input_raw_1;
 assign o_test_4 = y_input_raw_2;
-assign o_test_5 = y_input;
+assign o_test_5 = y_average_sum;
 assign o_test_6 = y_input_for_out;
 assign o_test_7 = current_sum_shifted_rebased;
 assign o_test_8 = dither_output_polarity;
@@ -1844,8 +1847,8 @@ assign o_test_9 = dither_output_count;
 assign o_test_10 = dac_output_out;
 assign o_test_11 = y_n_1;
 assign o_test_12 = y_n_2;
-assign o_test_13 = y_average_sum;
-assign o_test_14 = dither_input_polarity;
+assign o_test_13 = gain_only_sum[31:0];
+assign o_test_14 = gain_only_sum[63:32];
 assign o_test_15 = integral_sum[31:0];
 assign o_test_16 = integral_sum[63:32];
 
