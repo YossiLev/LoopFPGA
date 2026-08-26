@@ -534,7 +534,7 @@ reg               second_integrator_enable
 reg               continuous    ;    // Indicates whether continuous operation mode is running
 reg               continuous_input_select
                                 ;    // Indicates which input is selected for the continuous input select.
-reg               input_square  ;    // Indicates whether the input is squared before use or not.
+reg               input_special  ;    // Indicates whether the input is spatially manipulated before use or not.
 reg               pre_dither_manual_enable
                                 ;    // "0" = normal input to dither output (= output of pid).
                                      // "1" = manual input to dither output (= manual register value, pid result is discarded)
@@ -599,7 +599,7 @@ wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r6_y_n_6     ;
 wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r7_y_n_7     ; 
 wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_i0_y_n       ; 
 wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_i0_2nd_sum   ;
-wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_y_input_squared;
+wire signed [`INTERNAL_HIGH_ORDER_BIT:0]  w_y_input_special;
 
 //
 // --------------------------------------------------------------------------------
@@ -671,7 +671,11 @@ mult_32_32  mult_r6_y_n_6 (  .clock(logic_clk), .dataa(r6), .datab(y_n_6), .resu
 mult_32_32  mult_r7_y_n_7 (  .clock(logic_clk), .dataa(r7), .datab(y_n_7), .result(w_r7_y_n_7 )   ) ;
 mult_32_32  mult_i0_y_n   (  .clock(logic_clk), .dataa(i0    ), .datab(y_n  ), .result(w_i0_y_n   )   ) ;
 mult_32_32  mult_i0_2nd   (  .clock(logic_clk), .dataa(i0_2nd), .datab(current_sum_shifted_before_rebase_2nd), .result(w_i0_2nd_sum)   ) ;
-mult_32_32  mult_y_input_squared (  .clock(logic_clk), .dataa(y_input), .datab(y_input), .result(w_y_input_squared)   ) ;
+
+//mult_32_32  mult_y_input_squared (  .clock(logic_clk), .dataa(y_input), .datab(y_input), .result(w_y_input_special)   ) ;
+
+// calculate w_y_input_special to be the abs value of y_input. if y_inpyt is negative (bit[0]) then reverse sign of y_input. if y_input is positive then keep it as is.
+assign w_y_input_special = (y_input < 0) ? (~y_input) : y_input;
 
 // Two-flop synchronizer for y_reference (reg_clk -> logic_clk domain crossing)
 reg signed [31:0] y_reference_sync1;
@@ -706,7 +710,7 @@ always@(posedge reg_clk or negedge rst)
         continuous                  <=  0   ;
         output_shift                <=  0   ;
         continuous_input_select     <=  0   ;
-        input_square                <=  0   ;
+        input_special               <=  0   ;
         pre_dither_manual_enable    <=  0   ;
         out_offset                  <=  0   ;
         y_reference                 <=  0   ;
@@ -771,7 +775,7 @@ always@(posedge reg_clk or negedge rst)
                 sw_reset_request         <= i_config[0];
                 continuous               <= i_config[1] ;
                 continuous_input_select  <= i_config[2];   // "0" = A, "1" = B
-                input_square             <= i_config[9];   // "0" = standard input, "1" = square input
+                input_special            <= i_config[9];   // "0" = standard input, "1" = spatial manipulated input
                 pre_dither_manual_enable <= i_config[3];
                 output_shift             <= {10'b0, i_config[21:16]} ;
                 output_precision_size    <= i_config[8:4];
@@ -1222,18 +1226,18 @@ always@(posedge logic_clk or negedge rst)
 
                 dither_input_count <= 1'b1;
 
-                y_average_sum <= (dither_input_init_polarity ? (input_square ? w_y_input_squared : y_input) : -(input_square ? w_y_input_squared : y_input));
+                y_average_sum <= (dither_input_init_polarity ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
             end
             else
             begin
                 //
                 // No input dithering, just pick up the input
                 //
-                y_average_sum <= (input_square ? y_input : w_y_input_squared);
+                y_average_sum <= (input_special ? w_y_input_special : y_input);
             end
-            y_input_for_yn <= (input_square ? w_y_input_squared : y_input);
+            y_input_for_yn <= (input_special ? w_y_input_special : y_input);
             y_input_for_out <= y_input;
-            y_input_square_for_out <= (input_square ? w_y_input_squared : y_input);
+            y_input_square_for_out <= (input_special ? w_y_input_special : y_input);
 
             if (dither_output_enable)
             begin
@@ -1348,11 +1352,11 @@ always@(posedge logic_clk or negedge rst)
 
                 if (dither_input_polarity == 0)
                     begin
-                        y_average_sum <= y_average_sum - (input_square ? w_y_input_squared : y_input) ;
+                        y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input) ;
                     end
                 else
                     begin
-                        y_average_sum <= y_average_sum + (input_square ? w_y_input_squared : y_input) ;
+                        y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input) ;
                     end
 
                 dither_input_count <= 2;
@@ -1362,7 +1366,7 @@ always@(posedge logic_clk or negedge rst)
                 //
                 // Take the sum of the previous sample (in STATE_2).
                 //
-                y_average_sum <= y_average_sum + (input_square ? w_y_input_squared : y_input) ;
+                y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input) ;
             end
 
 
@@ -1408,7 +1412,7 @@ always@(posedge logic_clk or negedge rst)
             begin
                 dac_2nd_output <= integral_2nd_sum[output_shift_2nd +: 32] - out_offset_2nd;
             end
-            y_input_for_yn <= (input_square ? w_y_input_squared : y_input);
+            y_input_for_yn <= (input_special ? w_y_input_special : y_input);
 
         end
 
@@ -1561,11 +1565,11 @@ always@(posedge logic_clk or negedge rst)
                 //
                 if (dither_input_polarity)
                 begin
-                    y_average_sum <= y_average_sum + (input_square ? w_y_input_squared : y_input)  ;
+                    y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input)  ;
                 end
                 else
                 begin
-                    y_average_sum <= y_average_sum - (input_square ? w_y_input_squared : y_input)  ;
+                    y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input)  ;
                 end
 
                 case(dither_input_state)
@@ -1608,7 +1612,7 @@ always@(posedge logic_clk or negedge rst)
                 //
                 // Dithering not enabled - just normal averaging
                 //
-                y_average_sum <= y_average_sum + (input_square ? w_y_input_squared : y_input) ;
+                y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input) ;
             end
 
             if (!pre_dither_manual_enable)
@@ -1771,7 +1775,7 @@ assign    o_config  =    {  /* bit [31   ] */ second_integrator_enable      ,
                             /* bit [ 12  ] */ invert_y_n                    , 
                             /* bit [ 11  ] */ manual_dac_output_enable      ,    
                             /* bit [ 10  ] */ do_delay                      , 
-                            /* bit [  9  ] */ 1'b0                          ,  
+                            /* bit [  9  ] */ input_special                  ,  
                             /* bits[ 8:4 ] */ output_precision_size         , 
                             /* bit [  3  ] */ pre_dither_manual_enable      , 
                             /* bit [  2  ] */ continuous_input_select       , 
