@@ -1454,7 +1454,7 @@ always@(posedge logic_clk or negedge rst)
             y_n_1 <= save_y_n;
           
 
-            if (!pre_dither_manual_value)
+            if (!pre_dither_manual_enable)
             begin
                 //
                 // normal operation - either with/without output dither.
