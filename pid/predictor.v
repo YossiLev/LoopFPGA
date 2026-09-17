@@ -480,8 +480,7 @@ reg     [15:0]    i0_shift;    // Amount of right shift for the integrated multi
                                      // This allows finer resolution of the
                                      // integrator coefficient, which normally
                                      // can be very small
-reg     [31:0]    output_counter_1_limit
-;    // For high precision PWM output shaping:
+reg     [31:0]    output_counter_1_limit;    // For high precision PWM output shaping:
                                      // In order to generate a more precise DAC output, 
                                      // then the DAC is set to high and then low values corresponding
                                      // the high precision bits as set in the output_precision_size
@@ -491,23 +490,17 @@ reg     [31:0]    output_counter_1_limit
                                      // the rounded up valur of the DAC before switching to the rounded down 
                                      // value.
                                      //
-reg               output_precision_enable
-;      
-reg     [4:0]     output_precision_size
-;    // # of bits from the _unshifted output_ which are used to modulate the 
+reg               output_precision_enable;      
+reg     [4:0]     output_precision_size;    // # of bits from the _unshifted output_ which are used to modulate the 
                                      // output of the predictor.
-reg     [4:0]     output_precision_shift
-;    // offset of 1st bit to be used for output precision.
-reg     [5:0]     output_precision_1st_output_bit_shift
-;    // Defines the 1st bit which is actually would be output to  
+reg     [4:0]     output_precision_shift;    // offset of 1st bit to be used for output precision.
+reg     [5:0]     output_precision_1st_output_bit_shift;    // Defines the 1st bit which is actually would be output to  
                                      // the DAC = output_precision_shift + output_precision_size
-reg    [31:0]     output_precision_and_value
-;    // Value to and the shifted result to obtain the correct bit
+reg    [31:0]     output_precision_and_value;    // Value to and the shifted result to obtain the correct bit
                                      // size as specified in output_precision_size
                                      // (essentially:
                                      // output_precision_and_value = (1 << output_precision_size) - 1
-reg     [31:0]    output_precision_current_value
-;    // The current value of the PWM output shaper.
+reg     [31:0]    output_precision_current_value;    // The current value of the PWM output shaper.
                                      //
                                      // 
 
@@ -516,34 +509,28 @@ reg               do_delay;    // If '1' ==> after predictor finishes predicting
                                      // a counter that runs until delay_count
                                      // is reached.
 
-reg               output_precision_real_enable
-;
+reg               output_precision_real_enable;
 
-reg     [31:0]    second_output_value                               
-;
+reg     [31:0]    second_output_value;
 
-reg               second_integrator_output_enable
-;    // is second integration output enabled?
+reg               second_integrator_output_enable;    // is second integration output enabled?
                                      // (if not, it is just the copy of the
                                      //  1st).
-reg               second_integrator_enable
-;    // If not enabled, it just retains its last value.
+reg               second_integrator_enable;    // If not enabled, it just retains its last value.
                                 
 
 
 reg               continuous;    // Indicates whether continuous operation mode is running
-reg               continuous_input_select
-;    // Indicates which input is selected for the continuous input select.
+reg               continuous_input_select;    // Indicates which input is selected for the continuous input select.
 reg               input_special;    // Indicates whether the input is spatially manipulated before use or not.
-reg               pre_dither_manual_enable
-;    // "0" = normal input to dither output (= output of pid).
+reg               pre_dither_manual_enable;    // "0" = normal input to dither output (= output of pid).
                                      // "1" = manual input to dither output (= manual register value, pid result is discarded)
-reg     [31:0]    pre_dither_manual_value
-;    // Value of input to dither's output, in case pre-dither manual is enabled (see line above).
+reg     [31:0]    pre_dither_manual_value;
+reg     [31:0]    pre_dither_manual_value_sync_in;
+    // Value of input to dither's output, in case pre-dither manual is enabled (see line above).
 
 
-reg               sw_reset_request
-;    // S/W reset signal                                
+reg               sw_reset_request;    // S/W reset signal                                
 reg     signed [31:0]    y_reference;    // The reference point from which y_input is subtracted.
                                      // (i.e., the aim of the system is to
                                      // reduce this difference y_n = y_input - y_reference
@@ -560,14 +547,11 @@ reg     signed [31:0]    y_input_for_yn;
 reg     signed [31:0]    y_input_for_out;
 reg     signed [31:0]    y_input_square_for_out;
 
-reg               manual_dac_output_enable     
-;
-reg     [31:0]    manual_dac_output
-;
+reg               manual_dac_output_enable;
+reg     [31:0]    manual_dac_output;
 reg               invert_y_n;
 reg               invert_output;
-reg               y_input_diff_enable
-;    // Indicates that y_input is not one of the inputs, but rather the difference between them
+reg               y_input_diff_enable;    // Indicates that y_input is not one of the inputs, but rather the difference between them
 
 //
 // Output precision = ability to modulate the output value 
@@ -678,6 +662,11 @@ mult_32_32  mult_i0_2nd   (  .clock(logic_clk), .dataa(i0_2nd), .datab(current_s
 // calculate w_y_input_special to be the abs value of y_input. if y_inpyt is negative (bit[0]) then reverse sign of y_input. if y_input is positive then keep it as is.
 assign w_y_input_special = (y_input < 0) ? (~y_input) : y_input;
 
+assign inputSelection = (input_special ? w_y_input_special : y_input);
+
+assign ditherInputSelection = (dither_input_polarity == 0 ? inputSelection : -(inputSelection));
+
+
 // Two-flop synchronizer for y_reference (reg_clk -> logic_clk domain crossing)
 reg signed [31:0] y_reference_sync1;
 reg signed [31:0] y_reference_sync2;
@@ -730,14 +719,15 @@ always@(posedge reg_clk or negedge rst)
         y_input_diff_enable <=  0;
         second_integrator_output_enable <= 0;
         second_integrator_enable <=  0;
-        pre_dither_manual_value <=  0;                                    
+        // pre_dither_manual_value <=  0;    
+        pre_dither_manual_value_sync_in <= 0;                            
 
         end
     else begin
 	     //
 		  // normal operation - we pickup the scan value all the time
 		  //
-        pre_dither_manual_value <= i_pre_dither_manual_value;
+        pre_dither_manual_value_sync_in <= i_pre_dither_manual_value;
         if  (sw_reset_request)
             begin
                 sw_reset_request <= 0;
@@ -789,8 +779,7 @@ always@(posedge reg_clk or negedge rst)
                 output_precision_real_enable <= i_config[14] && (i_config[8:4] != 0);
                 output_precision_1st_output_bit_shift <= i_config[8:4] + i_config[28:24];
                 y_input_diff_enable <= i_config[29];
-                second_integrator_output_enable
- <= i_config[30];
+                second_integrator_output_enable <= i_config[30];
                 second_integrator_enable <= i_config[31];
             end
 
@@ -834,8 +823,7 @@ always@(posedge reg_clk or negedge rst)
             dither_output_init_count <= 0;
             dither_input_init_count <= 0;
             dither_input_next_count <= 0;
-            out_offset_plus_dither_amplitude
- <= 0;
+            out_offset_plus_dither_amplitude <= 0;
             output_shift_2nd <= 0;
             i0_shift <= 0;
             i0_2nd <= 0;
@@ -944,9 +932,7 @@ always@(posedge reg_clk or negedge rst)
 //
 reg [11:0] state_1;
 
-
 reg reset_pending;
-
 
 //
 // indicates whether predictor should start working.
@@ -1040,12 +1026,13 @@ always@(posedge logic_clk or negedge rst)
     end
     else begin
         reset_pending <= reset_pending;
+        pre_dither_manual_value <= pre_dither_manual_value_sync_in;
         if (sw_reset_request) begin
             reset_pending <= 1;
         end
         case(state_1)
         `STATE_0A:   begin
-            if(reset_pending)begin   
+            if(reset_pending) begin   
                 y_input <= 0;
                 y_input_for_yn <= 0;
                 y_n <= 0;
@@ -1231,17 +1218,17 @@ always@(posedge logic_clk or negedge rst)
                 if (dither_input_init_count == 16'b0)   
                 begin
                     dither_input_state <= 5'b00010;     // If init phase is 0, begin with next phase
+                    dither_input_polarity <= ~dither_input_init_polarity;
+                    y_average_sum <= (dither_input_init_polarity != 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
                 end
                 else
                 begin
                     dither_input_state <= 5'b00001;
+                    dither_input_polarity <= dither_input_init_polarity;
+                    y_average_sum <= (dither_input_init_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
                 end
 
-                dither_input_polarity <= dither_input_init_polarity;
-
                 dither_input_count <= 1'b1;
-                // xxxx
-                y_average_sum <= (dither_input_init_polarity == 0? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
             end
             else
             begin
@@ -1274,8 +1261,7 @@ always@(posedge logic_clk or negedge rst)
                 output_counter_1_limit <= 
                         w_predictor_high_precision_output[output_precision_shift +: 32]
                         & 
-                        output_precision_and_value 
-;
+                        output_precision_and_value;
                 output_precision_counter <= 1;
                 output_precision_low_value <=     w_predictor_high_precision_output[output_precision_1st_output_bit_shift +: 32];
                 output_precision_high_value <= 1 + w_predictor_high_precision_output[output_precision_1st_output_bit_shift +: 32];
@@ -1363,18 +1349,30 @@ always@(posedge logic_clk or negedge rst)
                 if (dither_input_init_count == 16'b1)
                     begin
                         dither_input_state <= 5'b00010;
-                    end
-
-                if (dither_input_polarity == 0)
-                    begin
-                        y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
+                        dither_output_polarity <= ~dither_output_polarity;
+                        if (dither_input_polarity == 0)
+                            begin
+                                y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
+                            end
+                        else
+                            begin
+                                y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
+                            end
+                        dither_input_count <= 1;
                     end
                 else
                     begin
-                        y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
+                        if (dither_input_polarity == 0)
+                            begin
+                                y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
+                            end
+                        else
+                            begin
+                                y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
+                            end
+                        dither_input_count <= 2;
                     end
 
-                dither_input_count <= 2;
             end
             else
             begin
@@ -1383,16 +1381,41 @@ always@(posedge logic_clk or negedge rst)
                 //
                 y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
             end
+            //  if (dither_input_enable)
+            //  begin
+            //     if (dither_input_init_count == 16'b1)
+            //         begin
+            //             dither_input_state <= 5'b00010;
+            //         end
+
+            //     if (dither_input_polarity == 0)
+            //         begin
+            //             y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
+            //         end
+            //     else
+            //         begin
+            //             y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
+            //         end
+
+            //     dither_input_count <= 2;
+            // end
+            // else
+            // begin
+            //     //
+            //     // Take the sum of the previous sample (in STATE_2).
+            //     //
+            //     y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
+            // end
 
 
-            if (dither_output_enable)
-            begin
-                if (dither_output_init_count <= 1'b1)
-                begin
-                    dither_output_polarity <= ~dither_output_polarity;
-                end
-                dither_output_count <= 2;
-            end
+            // if (dither_output_enable)
+            // begin
+            //     if (dither_output_init_count <= 1'b1)
+            //     begin
+            //         dither_output_polarity <= ~dither_output_polarity;
+            //     end
+            //     dither_output_count <= 2;
+            // end
 
 
             state_1 <= `STATE_4;
@@ -1872,7 +1895,7 @@ assign    o2_3rd_config                   = {16'b0, i0_2nd};
 assign    o2_manual_dac_output            = manual_dac_output;
 
 assign    o_debug_reg1                    = {16'h4567, 14'b0, second_integrator_output_enable, second_integrator_enable};
-assign    o_pre_dither_manual_value       = pre_dither_manual_value;
+assign    o_pre_dither_manual_value       = pre_dither_manual_value_sync_in;
 
 assign o_current_sum_before_rebase = current_sum_shifted_before_rebase;
 assign o_current_total_sum_high = {current_sum_total[`INTERNAL_HIGH_ORDER_BIT:32]};
