@@ -1035,17 +1035,8 @@ always@(posedge logic_clk or negedge rst)
             if(reset_pending) begin   
                 y_input <= 0;
                 y_input_for_yn <= 0;
-                y_n <= 0;
-                y_n_1 <= 0;
-                y_n_2 <= 0;
-                y_n_3 <= 0;
-                y_n_4 <= 0;
-                y_n_5 <= 0;
-                y_n_6 <= 0;
-                y_n_7 <= 0;
-                r0_y_n <= 0;
-                r1_y_n_1 <= 0;
-                r2_y_n_2 <= 0;
+                y_n <= 0; y_n_1 <= 0; y_n_2 <= 0; y_n_3 <= 0; y_n_4 <= 0; y_n_5 <= 0;  y_n_6 <= 0; y_n_7 <= 0;
+                r0_y_n <= 0; r1_y_n_1 <= 0; r2_y_n_2 <= 0;
                 r3_y_n_3 <= 0;
                 r4_y_n_4 <= 0;
                 r5_y_n_5 <= 0;
@@ -1215,20 +1206,39 @@ always@(posedge logic_clk or negedge rst)
                 // Input dithering - pickup the input subject to input
                 // dithering polarity and phase.
                 //
-                if (dither_input_init_count == 16'b0)   
+
+                // polarity of first sample is always by  init_polarity, and the first sample is always counted as 1 (not 0)
+                y_average_sum <= (dither_input_init_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+
+                if (dither_input_init_count == 16'b1) // lowest init count is 1, which means we only take the first sample and then switch polarity 
                 begin
-                    dither_input_state <= 5'b00010;     // If init phase is 0, begin with next phase
-                    dither_input_polarity <= ~dither_input_init_polarity;
-                    y_average_sum <= (dither_input_init_polarity != 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+                    dither_input_state <= 5'b00010;     // If init phase is 1, begin with next phase
+                    dither_input_polarity <= ~dither_input_init_polarity; // so we start with ~init and next count is 1,
+                    dither_input_count <= 16'b1;
                 end
                 else
                 begin
                     dither_input_state <= 5'b00001;
                     dither_input_polarity <= dither_input_init_polarity;
-                    y_average_sum <= (dither_input_init_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+                    // we continue counting down from init count, and we start with init polarity, and now ent count is 2
+                    dither_input_count <= 16'b10;
                 end
 
-                dither_input_count <= 1'b1;
+
+                // if (dither_input_init_count == 16'b0)   
+                // begin
+                //     dither_input_state <= 5'b00010;     // If init phase is 0, begin with next phase
+                //     dither_input_polarity <= ~dither_input_init_polarity;
+                //     y_average_sum <= (dither_input_init_polarity != 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+                // end
+                // else
+                // begin
+                //     dither_input_state <= 5'b00001;
+                //     dither_input_polarity <= dither_input_init_polarity;
+                //     y_average_sum <= (dither_input_init_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+                // end
+
+                // dither_input_count <= 1'b1;
             end
             else
             begin
@@ -1346,32 +1356,48 @@ always@(posedge logic_clk or negedge rst)
             //
             if (dither_input_enable)
             begin
-                if (dither_input_init_count == 16'b1)
+                y_average_sum <=  y_average_sum + (dither_input_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+
+                if (dither_input_init_count == 16'b10)
                     begin
                         dither_input_state <= 5'b00010;
-                        dither_output_polarity <= ~dither_output_polarity;
-                        if (dither_input_polarity == 0)
-                            begin
-                                y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
-                            end
-                        else
-                            begin
-                                y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
-                            end
-                        dither_input_count <= 1;
+                        // we are switching polarity
+                        dither_input_count <= 16'b1;
+                        dither_input_polarity <= ~dither_input_polarity;
                     end
                 else
                     begin
-                        if (dither_input_polarity == 0)
-                            begin
-                                y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
-                            end
-                        else
-                            begin
-                                y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
-                            end
-                        dither_input_count <= 2;
+                        // normal advance of the count, we are not switching polarity yet
+                        dither_input_count <= dither_input_count + 16'b1;
+
                     end
+                // if (dither_input_init_count == 16'b1)
+                //     begin
+                //         dither_input_state <= 5'b00010;
+                //         // we are switching polarity
+                //         if (dither_input_polarity == 0)
+                //             begin
+                //                 y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
+                //             end
+                //         else
+                //             begin
+                //                 y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
+                //             end
+                //         dither_input_count <= 1;
+                //         dither_input_polarity <= ~dither_input_polarity;
+                //     end
+                // else
+                //     begin
+                //         if (dither_input_polarity == 0)
+                //             begin
+                //                 y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
+                //             end
+                //         else
+                //             begin
+                //                 y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
+                //             end
+                //         dither_input_count <= 2;
+                //     end
 
             end
             else
@@ -1408,14 +1434,14 @@ always@(posedge logic_clk or negedge rst)
             // end
 
 
-            // if (dither_output_enable)
-            // begin
-            //     if (dither_output_init_count <= 1'b1)
-            //     begin
-            //         dither_output_polarity <= ~dither_output_polarity;
-            //     end
-            //     dither_output_count <= 2;
-            // end
+            if (dither_output_enable)
+            begin
+                if (dither_output_init_count <= 1'b1)
+                begin
+                    dither_output_polarity <= ~dither_output_polarity;
+                end
+                dither_output_count <= 2;
+            end
 
 
             state_1 <= `STATE_4;
@@ -1606,14 +1632,16 @@ always@(posedge logic_clk or negedge rst)
                 //
                 // Dithering IS enabled - sum according to polarity
                 //
-                if (dither_input_polarity == 0)
-                begin
-                    y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
-                end
-                else
-                begin
-                    y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
-                end
+                y_average_sum <=  y_average_sum + (dither_input_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+
+                // if (dither_input_polarity == 0)
+                // begin
+                //     y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
+                // end
+                // else
+                // begin
+                //     y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
+                // end
 
                 case(dither_input_state)
                 5'b00001: 
