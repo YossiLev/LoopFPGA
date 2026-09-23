@@ -212,39 +212,16 @@ module predictor
 
     output   wire [31:0] o_debug_reg1,
     output   wire [31:0] o_dac_output,
-    input    wire [31:0] i_test_1,
-    input    wire [31:0] i_test_2,
-    input    wire [31:0] i_test_3,
-    input    wire [31:0] i_test_4,
-    input    wire [31:0] i_test_5,
-    input    wire [31:0] i_test_6,
-    input    wire [31:0] i_test_7,
-    input    wire [31:0] i_test_8,
-    input    wire [31:0] i_test_9,
-    input    wire [31:0] i_test_10,
-    input    wire [31:0] i_test_11,
-    input    wire [31:0] i_test_12,
-    input    wire [31:0] i_test_13,
-    input    wire [31:0] i_test_14,
-    input    wire [31:0] i_test_15,
-    input    wire [31:0] i_test_16,   
-    output   wire [31:0] o_test_1,
-    output   wire [31:0] o_test_2,
-    output   wire [31:0] o_test_3,
-    output   wire [31:0] o_test_4,
-    output   wire [31:0] o_test_5,
-    output   wire [31:0] o_test_6,
-    output   wire [31:0] o_test_7,
-    output   wire [31:0] o_test_8,
-    output   wire [31:0] o_test_9,
-    output   wire [31:0] o_test_10,
-    output   wire [31:0] o_test_11,
-    output   wire [31:0] o_test_12,
-    output   wire [31:0] o_test_13,
-    output   wire [31:0] o_test_14,
-    output   wire [31:0] o_test_15,
-    output   wire [31:0] o_test_16,
 
+    input    wire [31:0] i_test_1, i_test_2, i_test_3, i_test_4,
+    input    wire [31:0] i_test_5, i_test_6, i_test_7, i_test_8,
+    input    wire [31:0] i_test_9, i_test_10, i_test_11, i_test_12,
+    input    wire [31:0] i_test_13, i_test_14, i_test_15, i_test_16, 
+
+    output   wire [31:0] o_test_1, o_test_2, o_test_3, o_test_4,
+    output   wire [31:0] o_test_5, o_test_6, o_test_7, o_test_8,
+    output   wire [31:0] o_test_9, o_test_10, o_test_11, o_test_12,
+    output   wire [31:0] o_test_13, o_test_14, o_test_15, o_test_16,
 
     //
     // ---------------------------------------------------------------
@@ -404,6 +381,7 @@ reg   [31:0]    r6;
 reg   [31:0]    r7;
 reg   [31:0]    i0;
 reg   [31:0]    i0_2nd;    // Coefficient of the double integrator
+
 reg   [31:0]    y_n;
 reg   [31:0]    y_n_1;    
 reg   [31:0]    y_n_2;    
@@ -462,8 +440,7 @@ wire  [`INTERNAL_HIGH_ORDER_BIT:0]    w_predictor_high_precision_output
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    integral_sum;    // 
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    integral_2nd_sum;    // 
 
-reg             input_averaging_enable
-;    // If '1' ==> each ADC clock the input is summed 
+reg             input_averaging_enable;    // If '1' ==> each ADC clock the input is summed 
                                      //            and in the next iteration
                                      //            of the predictor (including
                                      //            any intentional delay
@@ -1207,20 +1184,26 @@ always@(posedge logic_clk or negedge rst)
                 // dithering polarity and phase.
                 //
 
-                // polarity of first sample is always by  init_polarity, and the first sample is always counted as 1 (not 0)
-                y_average_sum <= (dither_input_init_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+                // polarity of first sample is always by  init_polarity, 
+                // and the first sample is always counted as 1 (not 0)
+                y_average_sum <= (dither_input_init_polarity == 0 ? 
+                        (input_special ? w_y_input_special : y_input) :
+                         -(input_special ? w_y_input_special : y_input));
 
-                if (dither_input_init_count == 16'b1) // lowest init count is 1, which means we only take the first sample and then switch polarity 
+                // lowest init count is 1, which means we only take the first sample and then switch polarity 
+                if (dither_input_init_count == 16'b1) 
                 begin
-                    dither_input_state <= 5'b00010;     // If init phase is 1, begin with next phase
-                    dither_input_polarity <= ~dither_input_init_polarity; // so we start with ~init and next count is 1,
+                    dither_input_state <= 5'b00010;     // If init phase is 1, switch to next phase
+                    // so we start with ~init and next count is 1,
+                    dither_input_polarity <= ~dither_input_init_polarity; 
                     dither_input_count <= 16'b1;
                 end
                 else
                 begin
                     dither_input_state <= 5'b00001;
+                    // we continue counting down from init count, 
+                    // and we start with init polarity, and now next count is 2
                     dither_input_polarity <= dither_input_init_polarity;
-                    // we continue counting down from init count, and we start with init polarity, and now ent count is 2
                     dither_input_count <= 16'b10;
                 end
 
@@ -1242,9 +1225,7 @@ always@(posedge logic_clk or negedge rst)
             end
             else
             begin
-                //
                 // No input dithering, just pick up the input
-                //
                 y_average_sum <= (input_special ? w_y_input_special : y_input);
             end
             y_input_for_yn <= (input_special ? w_y_input_special : y_input);
@@ -1356,20 +1337,23 @@ always@(posedge logic_clk or negedge rst)
             //
             if (dither_input_enable)
             begin
-                y_average_sum <=  y_average_sum + (dither_input_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+                // add the input to the sum, with polarity depending on the current polarity of the dither input
+                y_average_sum <=  y_average_sum + (dither_input_polarity == 0 ?
+                    (input_special ? w_y_input_special : y_input) :
+                    -(input_special ? w_y_input_special : y_input));
 
+                // if init count is 2, then now is the tme to switch polarity and stat again
                 if (dither_input_init_count == 16'b10)
                     begin
                         dither_input_state <= 5'b00010;
-                        // we are switching polarity
+                        // we are switching polarity, and stating at count at 1
                         dither_input_count <= 16'b1;
                         dither_input_polarity <= ~dither_input_polarity;
                     end
                 else
                     begin
-                        // normal advance of the count, we are not switching polarity yet
+                        // normal advance of the count, we are not switching polarity now
                         dither_input_count <= dither_input_count + 16'b1;
-
                     end
                 // if (dither_input_init_count == 16'b1)
                 //     begin
@@ -1632,7 +1616,9 @@ always@(posedge logic_clk or negedge rst)
                 //
                 // Dithering IS enabled - sum according to polarity
                 //
-                y_average_sum <=  y_average_sum + (dither_input_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
+                y_average_sum <=  y_average_sum + (dither_input_polarity == 0 ?
+                    (input_special ? w_y_input_special : y_input): 
+                    -(input_special ? w_y_input_special : y_input));
 
                 // if (dither_input_polarity == 0)
                 // begin
