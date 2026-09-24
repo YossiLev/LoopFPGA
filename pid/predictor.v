@@ -153,8 +153,7 @@ module predictor
     //
     //    outputs
     //
-    output  wire [31:0] o_y_n       ,  // 
-    output  wire [31:0] o_y_n_3     ,  // 
+    output  wire [31:0] o_y_n, o_y_n_3     ,  // 
     output  wire [31:0] o_q0_q4     ,  // [31:16] = q4, [15: 0] = q0
     output  wire [31:0] o_q1_q5     ,  // [31:16] = q5, [15: 0] = q1
     output  wire [31:0] o_q2_q6     ,  // [31:16] = q6, [15: 0] = q2
@@ -180,18 +179,9 @@ module predictor
     output  wire [31:0] o_delay_count   ,
     output  wire [31:0] o_delay_counter ,
                            
-    output   wire [31:0] o2_y_n_1     ,  
-    output   wire [31:0] o2_y_n_2     ,  
-    output   wire [31:0] o2_y_n_4     ,  // 
-    output   wire [31:0] o2_y_n_5     ,  // 
-    output   wire [31:0] o2_y_n_6     ,  // 
-    output   wire [31:0] o2_y_n_7     ,  // 
-    output   wire [31:0] o2_dither_config_1,
-    output   wire [31:0] o2_dither_config_2,
-    output   wire [31:0] o2_dither_config_3,
-    output   wire [31:0] o2_dither_count_1,
-    output   wire [31:0] o2_dither_count_2,
-    output   wire [31:0] o2_dither_count_3,
+    output   wire [31:0] o2_y_n_1, o2_y_n_2, o2_y_n_4, o2_y_n_5, o2_y_n_6, o2_y_n_7,
+    output   wire [31:0] o2_dither_config_1, o2_dither_config_2, o2_dither_config_3,
+    output   wire [31:0] o2_dither_count_1, o2_dither_count_2, o2_dither_count_3,
     output   wire [31:0] o2_2nd_out_offset,
     output   wire [31:0] o2_2nd_config    ,                                      
     output   wire [31:0] o2_3rd_config    ,                                      
@@ -342,10 +332,7 @@ endfunction
 // Capture configuration (written from reg_clk domain, read in logic_clk domain).
 // These are intentionally simple registers; no explicit CDC handshake is added
 // here — add one if your reg_clk and logic_clk are asynchronous to each other.
-reg  [5:0]  rec_index_A;
-reg  [5:0]  rec_index_B;
-reg  [5:0]  rec_index_C;
-reg  [5:0]  rec_index_D;
+reg  [5:0]  rec_index_A, rec_index_B, rec_index_C, rec_index_D;
 reg         rec_enable;        // owned exclusively by reg_clk
 reg         rec_active;        // owned exclusively by logic_clk
 reg  [9:0]  rec_counter;       // owned by logic_clk
@@ -357,10 +344,7 @@ reg  [31:0] rec_tick_counter;  // owned by logic_clk
 // provided you do not read and write the same address in the same cycle
 // (which this design avoids — writes happen on logic_clk, reads are
 // registered on reg_clk via o3_data_out).
-reg [31:0]  recorder_buf_A [0:1023];
-reg [31:0]  recorder_buf_B [0:1023];
-reg [31:0]  recorder_buf_C [0:1023];
-reg [31:0]  recorder_buf_D [0:1023];
+reg [31:0]  recorder_buf_A[0:1023], recorder_buf_B[0:1023], recorder_buf_C[0:1023], recorder_buf_D[0:1023];
 
 // Status word driven to the output port
 // bit[0] = rec_active (capture running), bits[10:1] = rec_counter
@@ -371,33 +355,15 @@ assign o3_recorder_status = {21'b0, rec_counter, rec_active};
 // Work registers (some of which are reflected to the bus)
 // ---------------------------------------------------------------
 //
-reg   [31:0]    r0;    // Coefficient of y_n = y_input - y_reference
-reg   [31:0]    r1;
-reg   [31:0]    r2;
-reg   [31:0]    r3;
-reg   [31:0]    r4;    
-reg   [31:0]    r5;
-reg   [31:0]    r6;
-reg   [31:0]    r7;
+    // Coefficient of y_n = y_input - y_reference
+reg   [31:0]    r0, r1, r2, r3, r4, r5, r6, r7;
+
 reg   [31:0]    i0;
 reg   [31:0]    i0_2nd;    // Coefficient of the double integrator
 
-reg   [31:0]    y_n;
-reg   [31:0]    y_n_1;    
-reg   [31:0]    y_n_2;    
-reg   [31:0]    y_n_3;    
-reg   [31:0]    y_n_4;    
-reg   [31:0]    y_n_5;    
-reg   [31:0]    y_n_6;    
-reg   [31:0]    y_n_7;    
+reg   [31:0]    y_n, y_n_1, y_n_2, y_n_3, y_n_4, y_n_5, y_n_6, y_n_7;
 
-reg   [31:0]    save_y_n;
-reg   [31:0]    save_y_n_1;
-reg   [31:0]    save_y_n_2;
-reg   [31:0]    save_y_n_3;
-reg   [31:0]    save_y_n_4;
-reg   [31:0]    save_y_n_5;
-reg   [31:0]    save_y_n_6;
+reg   [31:0]    save_y_n, save_y_n_1, save_y_n_2, save_y_n_3, save_y_n_4, save_y_n_5, save_y_n_6;
 
 reg   [31:0]    out_offset;    
 reg   [31:0]    out_offset_2nd;    
@@ -405,14 +371,7 @@ reg   [31:0]    out_offset_plus_dither_amplitude
 ;   // Keep out_offset + dither_amplitude for timing
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    i0_y_n;
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    i0_y_n_shifted;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r0_y_n;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r1_y_n_1;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r2_y_n_2;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r3_y_n_3;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r4_y_n_4;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r5_y_n_5;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r6_y_n_6;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r7_y_n_7;
+reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r0_y_n, r1_y_n, r2_y_n, r3_y_n, r4_y_n, r5_y_n, r6_y_n, r7_y_n;
 
 reg   [31:0]    delay_count;   // Delay cycles = # of state machine cycles (in units of 2 cycles to remain even!)
                                   // after the predictor has finished,
@@ -423,8 +382,7 @@ reg   [31:0]    delay_count;   // Delay cycles = # of state machine cycles (in u
 reg   [31:0]    delay_counter;                                    
 reg   [31:0]    delay_counter_intermediate;                                    
 
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    sum_r0_yn_r2_yn2;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    sum_r3_yn3_r5_yn5;
+reg   [`INTERNAL_HIGH_ORDER_BIT:0]    sum_r0_yn_r2_yn2, sum_r3_yn3_r5_yn5;
 
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    current_sum_total;
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    gain_only_sum;
@@ -550,14 +508,8 @@ wire    [63:0]    w_shifter_output_64;
 assign  w_continuous                = continuous; 
 //assign  w_continuous_input_select   = continuous_input_select;
 
-wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r0_y_n; 
-wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r1_y_n_1; 
-wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r2_y_n_2; 
-wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r3_y_n_3; 
-wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r4_y_n_4; 
-wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r5_y_n_5; 
-wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r6_y_n_6; 
-wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r7_y_n_7; 
+wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_r0_y_n, w_r1_y_n_1, w_r2_y_n_2, w_r3_y_n_3, w_r4_y_n_4, w_r5_y_n_5, w_r6_y_n_6, w_r7_y_n_7; 
+
 wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_i0_y_n; 
 wire [`INTERNAL_HIGH_ORDER_BIT:0]  w_i0_2nd_sum;
 wire signed [`INTERNAL_HIGH_ORDER_BIT:0]  w_y_input_special;
@@ -616,7 +568,7 @@ reg  [15:0]  dither_input_init_count;
 reg  [15:0]  dither_input_next_count;   
 reg  [15:0]  dither_input_count;
 reg  [31:0]  dac_output;
-reg  [31:0]  dac_output_source;
+// reg  [31:0]  dac_output_source;
 reg  [31:0]  dac_output_out;
 reg  [31:0]  reg_o_z_n;
 
@@ -643,10 +595,8 @@ assign inputSelection = (input_special ? w_y_input_special : y_input);
 
 assign ditherInputSelection = (dither_input_polarity == 0 ? inputSelection : -(inputSelection));
 
-
 // Two-flop synchronizer for y_reference (reg_clk -> logic_clk domain crossing)
-reg signed [31:0] y_reference_sync1;
-reg signed [31:0] y_reference_sync2;
+reg signed [31:0] y_reference_sync1, y_reference_sync2;
 
 always @(posedge logic_clk or negedge rst) begin
     if (!rst) begin
@@ -760,21 +710,20 @@ always@(posedge reg_clk or negedge rst)
                 second_integrator_enable <= i_config[31];
             end
 
-            if    (i_cs[6])
+            if (i_cs[6])
             begin
                 y_reference <= i_y_reference[31:0];
             end
 
-            if    (i_cs[7])
+            if (i_cs[7])
             begin
                 i0 <= {{16{i_i0[15]}}, i_i0[15:0]};
             end
 
-            if    (i_cs[11])
+            if (i_cs[11])
             begin
                 delay_count <= i_delay_count;
             end
-
 
             if (i_cs[13])
             begin
@@ -782,8 +731,6 @@ always@(posedge reg_clk or negedge rst)
             end
         end
     end
-
-
 
 //
 // state machine No.1.1
@@ -809,7 +756,7 @@ always@(posedge reg_clk or negedge rst)
     end
     else begin
 
-        if    (i2_write)
+        if (i2_write)
         begin
             //
             // Chip select bit masks select values:
@@ -899,10 +846,6 @@ always@(posedge reg_clk or negedge rst)
         end
     end
 
-
-
-
-
 //
 // state machine No.2
 // Handles the predictor core logic itself
@@ -931,7 +874,6 @@ reg       signed [31:0]   y_input_raw_2;
         
 localparam signed [31:0] DAC_MIN = 32'sd0;
 localparam signed [31:0] DAC_MAX = 32'sd16383;
-
 
 //
 // A clear "name" for the high precision result of the predictor,
@@ -998,7 +940,7 @@ always@(posedge logic_clk or negedge rst)
         dither_input_polarity <= 0;
         dither_output_count <= 0;
         dac_output <= 0;
-        dac_output_source <= 1;
+        // dac_output_source <= 1;
         dac_2nd_output <= 0;
     end
     else begin
@@ -1102,13 +1044,13 @@ always@(posedge logic_clk or negedge rst)
                 if (dither_output_enable)
                 begin
                     dac_output <= current_sum_shifted_before_rebase - out_offset_plus_dither_amplitude;
-                    dac_output_source <= 2;
+                    // dac_output_source <= 2;
 
                 end
                 else
                 begin
                     dac_output <= current_sum_shifted_before_rebase - out_offset;
-                    dac_output_source <= 3;
+                    // dac_output_source <= 3;
                 end
             end
             else
@@ -1123,18 +1065,18 @@ always@(posedge logic_clk or negedge rst)
                     if (dither_output_polarity)
                     begin
                         dac_output <= pre_dither_manual_value + dither_output_amplitude;
-                        dac_output_source <= 4;
+                        // dac_output_source <= 4;
                     end
                     else
                     begin
                         dac_output <= pre_dither_manual_value - dither_output_amplitude;
-                        dac_output_source <= 5;
+                        // dac_output_source <= 5;
                     end
                 end
                 else
                 begin
                     dac_output <= pre_dither_manual_value - out_offset;
-                    dac_output_source <= 6; 
+                    // dac_output_source <= 6; 
                 end
             end
 
@@ -1184,7 +1126,7 @@ always@(posedge logic_clk or negedge rst)
                 // dithering polarity and phase.
                 //
 
-                // polarity of first sample is always by  init_polarity, 
+                // polarity of first sample is always determinedby  init_polarity, 
                 // and the first sample is always counted as 1 (not 0)
                 y_average_sum <= (dither_input_init_polarity == 0 ? 
                         (input_special ? w_y_input_special : y_input) :
@@ -1193,8 +1135,9 @@ always@(posedge logic_clk or negedge rst)
                 // lowest init count is 1, which means we only take the first sample and then switch polarity 
                 if (dither_input_init_count == 16'b1) 
                 begin
-                    dither_input_state <= 5'b00010;     // If init phase is 1, switch to next phase
-                    // so we start with ~init and next count is 1,
+                    // If init phase is 1, switch to next phase
+                    dither_input_state <= 5'b00010;
+                    // so we start with ~init and next count is 1, becasue the next value will be the first
                     dither_input_polarity <= ~dither_input_init_polarity; 
                     dither_input_count <= 16'b1;
                 end
@@ -1207,21 +1150,6 @@ always@(posedge logic_clk or negedge rst)
                     dither_input_count <= 16'b10;
                 end
 
-
-                // if (dither_input_init_count == 16'b0)   
-                // begin
-                //     dither_input_state <= 5'b00010;     // If init phase is 0, begin with next phase
-                //     dither_input_polarity <= ~dither_input_init_polarity;
-                //     y_average_sum <= (dither_input_init_polarity != 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
-                // end
-                // else
-                // begin
-                //     dither_input_state <= 5'b00001;
-                //     dither_input_polarity <= dither_input_init_polarity;
-                //     y_average_sum <= (dither_input_init_polarity == 0 ? (input_special ? w_y_input_special : y_input) : -(input_special ? w_y_input_special : y_input));
-                // end
-
-                // dither_input_count <= 1'b1;
             end
             else
             begin
@@ -1235,7 +1163,6 @@ always@(posedge logic_clk or negedge rst)
             if (dither_output_enable)
             begin
                 dither_output_polarity <= 0;
-
                 dither_output_count <= 1'b1;
             end
 
@@ -1287,7 +1214,7 @@ always@(posedge logic_clk or negedge rst)
                 else
                     z_n_raw = ~dac_output;
 
-                // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
+                // Clamp output to [0 .. 16383 (for 14-bit DAC with 1.5V ref)]
                 if      (z_n_raw < DAC_MIN) reg_o_z_n <= DAC_MIN;
                 else if (z_n_raw > DAC_MAX) reg_o_z_n <= DAC_MAX;
                 else                          reg_o_z_n <= z_n_raw;
@@ -1332,17 +1259,18 @@ always@(posedge logic_clk or negedge rst)
             //                                                          |integral_sum after the latest summation |
             current_sum_total <= sum_r0_yn_r2_yn2 + sum_r3_yn3_r5_yn5 + (integral_sum + i0_y_n_shifted           );
             gain_only_sum <= sum_r0_yn_r2_yn2 + sum_r3_yn3_r5_yn5; // for debug only
+            
             //
             // Propagate input dithering
             //
             if (dither_input_enable)
             begin
-                // add the input to the sum, with polarity depending on the current polarity of the dither input
+                // add the input to the sum, with current polarity of the dither input
                 y_average_sum <=  y_average_sum + (dither_input_polarity == 0 ?
                     (input_special ? w_y_input_special : y_input) :
                     -(input_special ? w_y_input_special : y_input));
 
-                // if init count is 2, then now is the tme to switch polarity and stat again
+                // if init count is 2, then now is the time to switch polarity and start again
                 if (dither_input_init_count == 16'b10)
                     begin
                         dither_input_state <= 5'b00010;
@@ -1355,33 +1283,6 @@ always@(posedge logic_clk or negedge rst)
                         // normal advance of the count, we are not switching polarity now
                         dither_input_count <= dither_input_count + 16'b1;
                     end
-                // if (dither_input_init_count == 16'b1)
-                //     begin
-                //         dither_input_state <= 5'b00010;
-                //         // we are switching polarity
-                //         if (dither_input_polarity == 0)
-                //             begin
-                //                 y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
-                //             end
-                //         else
-                //             begin
-                //                 y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
-                //             end
-                //         dither_input_count <= 1;
-                //         dither_input_polarity <= ~dither_input_polarity;
-                //     end
-                // else
-                //     begin
-                //         if (dither_input_polarity == 0)
-                //             begin
-                //                 y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
-                //             end
-                //         else
-                //             begin
-                //                 y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
-                //             end
-                //         dither_input_count <= 2;
-                //     end
 
             end
             else
@@ -1391,32 +1292,6 @@ always@(posedge logic_clk or negedge rst)
                 //
                 y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
             end
-            //  if (dither_input_enable)
-            //  begin
-            //     if (dither_input_init_count == 16'b1)
-            //         begin
-            //             dither_input_state <= 5'b00010;
-            //         end
-
-            //     if (dither_input_polarity == 0)
-            //         begin
-            //             y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
-            //         end
-            //     else
-            //         begin
-            //             y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
-            //         end
-
-            //     dither_input_count <= 2;
-            // end
-            // else
-            // begin
-            //     //
-            //     // Take the sum of the previous sample (in STATE_2).
-            //     //
-            //     y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
-            // end
-
 
             if (dither_output_enable)
             begin
@@ -1478,15 +1353,10 @@ always@(posedge logic_clk or negedge rst)
 
             count_input <= 32'b0;   
 
-            y_n_7 <= save_y_n_6;
-            y_n_6 <= save_y_n_5;
-            y_n_5 <= save_y_n_4;
-            y_n_4 <= save_y_n_3;
-            y_n_3 <= save_y_n_2;
-            y_n_2 <= save_y_n_1;
-            y_n_1 <= save_y_n;
+            // copy backword the saved y_n values to the current y_n values
+            y_n_7 <= save_y_n_6; y_n_6 <= save_y_n_5; y_n_5 <= save_y_n_4;
+            y_n_4 <= save_y_n_3; y_n_3 <= save_y_n_2; y_n_2 <= save_y_n_1; y_n_1 <= save_y_n;
           
-
             if (!pre_dither_manual_enable)
             begin
                 //
@@ -1498,12 +1368,12 @@ always@(posedge logic_clk or negedge rst)
                     if (dither_output_polarity)
                     begin
                         dac_output <= current_sum_shifted_rebased + dither_output_amplitude;
-                        dac_output_source <= 7;
+                        // dac_output_source <= 7;
                     end
                     else
                     begin
                         dac_output <= current_sum_shifted_rebased - dither_output_amplitude;
-                        dac_output_source <= 8;
+                        // dac_output_source <= 8;
                     end
                 end
             end
@@ -1519,12 +1389,12 @@ always@(posedge logic_clk or negedge rst)
                     if (dither_output_polarity)
                     begin
                         dac_output <= pre_dither_manual_value + dither_output_amplitude;
-                        dac_output_source <= 9;
+                        // dac_output_source <= 9;
                     end
                     else
                     begin
                         dac_output <= pre_dither_manual_value - dither_output_amplitude;
-                        dac_output_source <= 10;
+                        // dac_output_source <= 10;
                     end
                 end
             end
@@ -1575,10 +1445,10 @@ always@(posedge logic_clk or negedge rst)
                 else
                     z_n_raw = ~dac_output;
 
-                // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
+                // Clamp output to [0 .. 16383 (for 14-bit DAC with 1.5V ref)]
                 if      (z_n_raw < DAC_MIN) reg_o_z_n <= DAC_MIN;
                 else if (z_n_raw > DAC_MAX) reg_o_z_n <= DAC_MAX;
-                else                          reg_o_z_n <= z_n_raw;
+                else                        reg_o_z_n <= z_n_raw;
              end
 
             //
@@ -1620,20 +1490,12 @@ always@(posedge logic_clk or negedge rst)
                     (input_special ? w_y_input_special : y_input): 
                     -(input_special ? w_y_input_special : y_input));
 
-                // if (dither_input_polarity == 0)
-                // begin
-                //     y_average_sum <= y_average_sum + (input_special ? w_y_input_special : y_input);
-                // end
-                // else
-                // begin
-                //     y_average_sum <= y_average_sum - (input_special ? w_y_input_special : y_input);
-                // end
-
                 case(dither_input_state)
                 5'b00001: 
                     begin 
                         if (dither_input_count >= dither_input_init_count)
                         begin
+                            // switch to next state, and switch polarity, start count at 1
                             dither_input_state <= 5'b00010;
                             dither_input_count <= 1;
                             dither_input_polarity <= ~dither_input_polarity;
@@ -1648,6 +1510,7 @@ always@(posedge logic_clk or negedge rst)
                     begin 
                         if (dither_input_count >= dither_input_next_count)
                         begin
+                            // switch to next next state, and switch polarity, start count at 1
                             dither_input_state <= 5'b00100;
                             dither_input_count <= 1;
                             dither_input_polarity <= ~dither_input_polarity;
@@ -1659,7 +1522,8 @@ always@(posedge logic_clk or negedge rst)
                     end
 
                 5'b00100: 
-                    begin 
+                    begin
+                        // remain counting until the end
                         dither_input_count <= dither_input_count + 16'b1;
                     end
                 endcase
@@ -1683,18 +1547,18 @@ always@(posedge logic_clk or negedge rst)
                     if (dither_output_polarity)
                     begin
                         dac_output <= current_sum_shifted_rebased + dither_output_amplitude;
-                        dac_output_source <= 11;
+                        //dac_output_source <= 11;
                     end
                     else
                     begin
                         dac_output <= current_sum_shifted_rebased - dither_output_amplitude;
-                        dac_output_source <= 12;
+                        // dac_output_source <= 12;
                     end
                 end
                 else
                 begin
                     dac_output <= current_sum_shifted_rebased;
-                    dac_output_source <= 13;
+                    // dac_output_source <= 13;
                 end
             end
             else
@@ -1708,18 +1572,18 @@ always@(posedge logic_clk or negedge rst)
                     if (dither_output_polarity)
                     begin
                         dac_output <= pre_dither_manual_value + dither_output_amplitude;
-                        dac_output_source <= 14;
+                        // dac_output_source <= 14;
                     end
                     else
                     begin
                         dac_output <= pre_dither_manual_value - dither_output_amplitude;
-                        dac_output_source <= 15;
+                        // dac_output_source <= 15;
                     end
                 end
                 else
                 begin
                     dac_output <= pre_dither_manual_value;
-                    dac_output_source <= 16;
+                    // dac_output_source <= 16;
                 end
             end
 
@@ -1757,13 +1621,11 @@ always@(posedge logic_clk or negedge rst)
                 else
                     z_n_raw = ~dac_output;
 
+                // Clamp output to [0 .. 16383 (for 14-bit DAC with 1.5V ref)]
                 if      (z_n_raw < DAC_MIN) reg_o_z_n <= DAC_MIN;
                 else if (z_n_raw > DAC_MAX) reg_o_z_n <= DAC_MAX;
                 else                          reg_o_z_n <= z_n_raw;
-                // Clamp output to [50 .. 16350 (16384 for 14-bit DAC with 1.5V ref)]
-                // if      (z_n_raw < 32'd50)   reg_o_z_n <= 32'd50;
-                // else if (z_n_raw > 32'd16350) reg_o_z_n <= 32'd16350;
-                // else                          reg_o_z_n <= z_n_raw;
+
             end
 
 
@@ -1930,7 +1792,7 @@ assign o_test_12 = dither_input_count;
 assign o_test_13 = gain_only_sum[31:0];
 assign o_test_14 = gain_only_sum[63:32];
 assign o_test_15 = integral_sum[31:0];
-assign o_test_16 = dac_output_source;
+// assign o_test_16 = dac_output_source;
 
 
 // ---------------------------------------------------------------
