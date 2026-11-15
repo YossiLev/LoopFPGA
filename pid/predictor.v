@@ -371,7 +371,7 @@ reg   [31:0]    out_offset_plus_dither_amplitude
 ;   // Keep out_offset + dither_amplitude for timing
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    i0_y_n;
 reg   [`INTERNAL_HIGH_ORDER_BIT:0]    i0_y_n_shifted;
-reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r0_y_n, r1_y_n, r2_y_n, r3_y_n, r4_y_n, r5_y_n, r6_y_n, r7_y_n;
+reg   [`INTERNAL_HIGH_ORDER_BIT:0]    r0_y_n, r1_y_n_1, r2_y_n_2, r3_y_n_3, r4_y_n_4, r5_y_n_5, r6_y_n_6, r7_y_n_7;
 
 reg   [31:0]    delay_count;   // Delay cycles = # of state machine cycles (in units of 2 cycles to remain even!)
                                   // after the predictor has finished,
@@ -415,6 +415,7 @@ reg     [15:0]    i0_shift;    // Amount of right shift for the integrated multi
                                      // This allows finer resolution of the
                                      // integrator coefficient, which normally
                                      // can be very small
+reg     [`INTERNAL_HIGH_ORDER_BIT:0] i0_half_addition;
 reg     [31:0]    output_counter_1_limit;    // For high precision PWM output shaping:
                                      // In order to generate a more precise DAC output, 
                                      // then the DAC is set to high and then low values corresponding
@@ -750,6 +751,7 @@ always@(posedge reg_clk or negedge rst)
             out_offset_plus_dither_amplitude <= 0;
             output_shift_2nd <= 0;
             i0_shift <= 0;
+            i0_half_addition <= 0;
             i0_2nd <= 0;
             second_output_value <= 0;
             manual_dac_output <= 0;
@@ -819,6 +821,7 @@ always@(posedge reg_clk or negedge rst)
                 //
                 output_shift_2nd <= i2_2nd_config[15: 0];
                 i0_shift <= i2_2nd_config[31:16];
+                i0_half_addition <= (i2_2nd_config[31:16] == 0) ? 0 : (1 << (i2_2nd_config[31:16] - 1));
             end
 
             if (i2_cs[8])
@@ -1227,7 +1230,10 @@ always@(posedge logic_clk or negedge rst)
             // y_input_raw_2 is essentially 0.
             //
             y_input <= y_input_raw_1 - y_input_raw_2 - y_reference_sync2;
-            i0_y_n_shifted <= i0_y_n[i0_shift +:48];
+            // i0_y_n_shifted <= i0_y_n[i0_shift +:48];
+            //i0_y_n_shifted <= $signed( ( ( $signed(i0_y_n) >>> i0_shift ) & 64'h0000FFFFFFFFFFFF ) );
+            i0_y_n_shifted <= ( $signed( $signed(i0_y_n + i0_half_addition) >>> i0_shift ) <<< 16 ) >>> 16;
+
 
             //
             // Evaluate the sums (part of them)
